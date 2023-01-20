@@ -38,14 +38,30 @@
                             </div>
 
                             <div class="form-group row">
-                                <label for="name" class="col-md-4 col-form-label text-md-right">{{ __('Username') }}</label>
+                                <label for="address" class="col-md-4 col-form-label text-md-right">{{ __('Address') }}</label>
 
                                 <div class="col-md-6">
-                                    <input id="username" type="text" class="form-control{{ $errors->has('username') ? ' is-invalid' : '' }}" name="username" value="{{ old('username') }}" required autofocus>
-
-                                    @if ($errors->has('username'))
+                                    <textarea id="alamat" type="text" class="form-control{{ $errors->has('alamat') ? ' is-invalid' : '' }}" name="alamat" value="{{ old('alamat') }}" required  rows="4" cols="50"></textarea>
+                                    @if ($errors->has('alamat'))
                                         <span class="invalid-feedback">
-                                        <strong>{{ $errors->first('username') }}</strong>
+                                        <strong>{{ $errors->first('alamat') }}</strong>
+                                    </span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="gender" class="col-md-4 col-form-label text-md-right">{{ __('Gender') }}</label>
+
+                                <div class="col-md-6">
+                                        <select class="form-control" name="gender" class="form-control{{ $errors->has('gender') ? ' is-invalid' : '' }}" name="gender" value="{{ old('gender') }}" required>
+                                            <option value="Laki-Laki" @if (old('active') == "Laki-Laki") selected @endif>Laki-Laki</option>
+                                            <option value="Perempuan" @if (old('active') == "Perempuan") selected @endif>Perempuan</option>
+                                        </select>
+
+                                    @if ($errors->has('gender'))
+                                        <span class="invalid-feedback">
+                                        <strong>{{ $errors->first('gender') }}</strong>
                                     </span>
                                     @endif
                                 </div>
@@ -84,6 +100,33 @@
 
                                 <div class="col-md-6">
                                     <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="description" class="col-md-4 col-form-label text-md-right">{{ __('Description') }}</label>
+
+                                <div class="col-md-6">
+                                <textarea id="description" type="text" class="form-control{{ $errors->has('description') ? ' is-invalid' : '' }}" name="description" value="{{ old('description') }}" required  rows="4" cols="50"></textarea>
+                                    @if ($errors->has('description'))
+                                        <span class="invalid-feedback">
+                                        <strong>{{ $errors->first('description') }}</strong>
+                                    </span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="Price" class="col-md-4 col-form-label text-md-right">{{ __('Price') }}</label>
+
+                                <div class="col-md-6">
+                                    <input id="price" type="text" class="form-control{{ $errors->has('price') ? ' is-invalid' : '' }}" name="price" value="{{ old('price') }}">
+
+                                    @if ($errors->has('price'))
+                                        <span class="invalid-feedback">
+                                        <strong>{{ $errors->first('price') }}</strong>
+                                    </span>
+                                    @endif
                                 </div>
                             </div>
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\User;
+use App\UserDoctorDetail;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -29,22 +30,16 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo;
+    //protected $redirectTo;
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct()
-    {
-        if (Auth::check() && Auth::user()->role->id == 1)
-        {
-            $this->redirectTo = route('admin.dashboard');
-        } else {
-            $this->redirectTo = route('author.dashboard');
-        }
-        $this->middleware('guest');
+
+    public function __construct(){
+       $this->middleware('guest');
     }
 
     /**
@@ -57,7 +52,6 @@ class RegisterController extends Controller
     {
         return Validator::make($data, [
             'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
         ]);
@@ -71,12 +65,25 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
-            'role_id' => 2,
-            'name' => $data['name'],
-            'username' => str_slug($data['username']),
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+        $user = new User();
+        $user->name = $data['name'];
+        $user->email = $data['email'];
+        $user->password = Hash::make($data['password']);
+        $user->address = $data['alamat'];
+        $user->gender = $data['gender'];
+        $user->created_at = date('Y-m-d H:i:s');
+        $user->updated_at = date('Y-m-d H:i:s');
+        
+        if($user->save()){
+            UserDoctorDetail::insertGetId([
+                'user_id' => $user->id,
+                'description' => $data['description'],
+                'price' => $data['price'],
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+            return view('auth.register');
+        }
     }
+
 }
