@@ -69,7 +69,7 @@ class RegisterController extends Controller
         $user->name = $data['name'];
         $user->email = $data['email'];
         $user->password = Hash::make($data['password']);
-        $user->address = $data['alamat'];
+        $user->address = $data['address'];
         $user->gender = $data['gender'];
         $user->created_at = date('Y-m-d H:i:s');
         $user->updated_at = date('Y-m-d H:i:s');

@@ -41,10 +41,10 @@
                                 <label for="address" class="col-md-4 col-form-label text-md-right">{{ __('Address') }}</label>
 
                                 <div class="col-md-6">
-                                    <textarea id="alamat" type="text" class="form-control{{ $errors->has('alamat') ? ' is-invalid' : '' }}" name="alamat" value="{{ old('alamat') }}" required  rows="4" cols="50"></textarea>
-                                    @if ($errors->has('alamat'))
+                                    <textarea id="address" type="text" class="form-control{{ $errors->has('address') ? ' is-invalid' : '' }}" name="address" value="{{ old('address') }}" required  rows="4" cols="50"></textarea>
+                                    @if ($errors->has('address'))
                                         <span class="invalid-feedback">
-                                        <strong>{{ $errors->first('alamat') }}</strong>
+                                        <strong>{{ $errors->first('address') }}</strong>
                                     </span>
                                     @endif
                                 </div>

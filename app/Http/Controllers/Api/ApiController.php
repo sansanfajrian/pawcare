@@ -58,7 +58,7 @@ class ApiController extends Controller
                     'role_id' => 3,
                     'email' => $request->email,
                     'gender' => $request->gender,
-                    'address' => $request->alamat,
+                    'address' => $request->address,
                     'password' => Hash::make($request->password),
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
