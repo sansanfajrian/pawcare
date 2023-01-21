@@ -646,6 +646,9 @@ mark,
   font-size: 80%;
   color: #636c72;
 }
+footer {
+  background-color: #FF9494  !important;
+}
 
 .blockquote-footer::before {
   content: "\2014 \00A0";
@@ -2319,6 +2322,8 @@ select.form-control:focus::-ms-value {
   padding-top: calc(0.5rem - 1px * 2);
   padding-bottom: calc(0.5rem - 1px * 2);
   margin-bottom: 0;
+  color: #FF9494 !important;
+  font-weight: 700 !important;
 }
 
 .col-form-label-lg {
@@ -2679,8 +2684,8 @@ fieldset[disabled] a.btn {
 
 .btn-primary {
   color: #fff;
-  background-color: #0275d8;
-  border-color: #0275d8;
+  background-color: #FF9494;
+  border-color: #FF9494;
 }
 
 .btn-primary:hover {

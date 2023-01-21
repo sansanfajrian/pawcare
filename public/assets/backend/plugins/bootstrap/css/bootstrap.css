@@ -3136,8 +3136,8 @@ fieldset[disabled] .btn-default.focus {
 .btn-primary.active,
 .open > .dropdown-toggle.btn-primary {
   color: #fff;
-  background-color: #286090;
-  border-color: #204d74;
+  background-color: #FF9494;
+  border-color: #FF9494;
 }
 .btn-primary:active:hover,
 .btn-primary.active:hover,
@@ -5485,6 +5485,9 @@ button.list-group-item-danger.active:focus {
 .panel-title > small > a,
 .panel-title > .small > a {
   color: inherit;
+}
+footer {
+  background-color: #FF9494 !important;
 }
 .panel-footer {
   padding: 10px 15px;
