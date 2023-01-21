@@ -45,6 +45,12 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
+                <li class="{{ Request::is('admin/banner') ? 'active' : '' }}">
+                    <a href="{{ route('admin.banner.index') }}">
+                        <i class="material-icons">image</i>
+                        <span>Banner</span>
+                    </a>
+                </li>
                 <li class="{{ Request::is('admin/tag*') ? 'active' : '' }}">
                     <a href="{{ route('admin.tag.index') }}">
                         <i class="material-icons">label</i>

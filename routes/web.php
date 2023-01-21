@@ -42,6 +42,7 @@ Route::group(['as'=>'admin.','prefix'=>'admin','namespace'=>'Admin','middleware'
     Route::resource('tag','TagController');
     Route::resource('category','CategoryController');
     Route::resource('post','PostController');
+    Route::resource('banner','BannerController');
 
     Route::get('/pending/post','PostController@pending')->name('post.pending');
     Route::put('/post/{id}/approve','PostController@approval')->name('post.approve');
@@ -75,4 +76,9 @@ Route::group(['as'=>'author.','prefix'=>'author','namespace'=>'Author','middlewa
 View::composer('layouts.frontend.partial.footer',function ($view) {
     $categories = App\Category::all();
     $view->with('categories',$categories);
+});
+
+View::composer('layouts.frontend.partial.footer',function ($view) {
+    $banners = App\Banner::all();
+    $view->with('banners',$banners);
 });
