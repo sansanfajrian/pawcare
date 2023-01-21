@@ -42,6 +42,7 @@ class BannerController extends Controller
     public function store(Request $request)
     {
         $this->validate($request,[
+            'sequence' => 'required',
             'image' => 'required|mimes:jpeg,bmp,png,jpg'
         ]);
         // get form image
@@ -113,6 +114,7 @@ class BannerController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request,[
+            'sequence' => 'required',
             'image' => 'mimes:jpeg,bmp,png,jpg'
         ]);
         // get form image

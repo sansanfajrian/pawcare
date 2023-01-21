@@ -21,6 +21,7 @@ class UsersTableSeeder extends Seeder
             'created_at' => '2022-05-10',
             'updated_at' => '2022-05-10',
             'address' => 'Pawcare Admin',
+            'phone' => '+6285974211040'
         ]);
     }
 }

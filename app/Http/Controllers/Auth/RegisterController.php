@@ -54,6 +54,7 @@ class RegisterController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
+            'phone' => 'required|min:8|max:14',
         ]);
     }
 
@@ -71,6 +72,7 @@ class RegisterController extends Controller
         $user->password = Hash::make($data['password']);
         $user->address = $data['address'];
         $user->gender = $data['gender'];
+        $user->phone = $data['phone'];
         $user->created_at = date('Y-m-d H:i:s');
         $user->updated_at = date('Y-m-d H:i:s');
         

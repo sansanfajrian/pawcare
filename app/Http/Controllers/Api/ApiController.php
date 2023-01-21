@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use DB;
 use App\User;
 use App\UserDoctorDetail;
+use App\Banner;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -60,6 +61,7 @@ class ApiController extends Controller
                     'gender' => $request->gender,
                     'address' => $request->address,
                     'password' => Hash::make($request->password),
+                    'phone' => $request->phone,
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);
@@ -77,6 +79,48 @@ class ApiController extends Controller
         ]);
     }
 
+
+    public function editUser(Request $request, $id)
+    {
+        $token = $this::getCurrentToken($request);
+		$user = User::where('id', $token->user_id)->first();
+		if(empty($user)) {
+			return response()->json([
+                'status' => 'FAIL',
+                'message' => 'Invalid User ID'
+            ]);
+		}
+
+        $isSuccess = false;
+
+        DB::beginTransaction();
+        try{
+            $user = User::find($id);
+            $user->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'address' => $request->address,
+                'phone' => $request->phone,
+                'image' => $request->image,
+                'banner' => $request->banner
+            ]);
+            DB::commit();
+            $isSuccess = true;
+        }
+        catch(Exception $e){
+            DB::rollback();
+            $isSuccess = false; 
+        }
+
+        return response()->json([
+            'status' => $isSuccess ? 'OK' : 'FAIL',
+            'message' => $isSuccess ? 'Berhasil Mengedit User!' : 'Gagal Mengedit User!',
+            'result' => [
+                'users' => $user
+            ]
+        ]);
+    }
+
     public function doctorList(Request $request)
     {
         $token = $this::getCurrentToken($request);
@@ -91,6 +135,7 @@ class ApiController extends Controller
         $doctorList = [];
         foreach($fetchDoctorList as $doctor) {
             $doctorList[] = [
+                'id' => $doctor->user->id,
                 'name' => $doctor->user->name,
                 'address' => $doctor->user->address,
                 'price' => $doctor->price,
@@ -102,6 +147,64 @@ class ApiController extends Controller
             'status' => 'OK',
             'results' => [
                 'doctor_list' => $doctorList
+            ]
+        ]);
+    }
+
+    public function doctorDetail(Request $request, $id)
+    {
+        $token = $this::getCurrentToken($request);
+        $fetchDoctorList = UserDoctorDetail::select([
+                'user_doctor_details.*',
+                'users.name AS name',
+                'users.address AS address'
+            ])
+            ->leftJoin('users', 'users.id', 'user_doctor_details.user_id')
+            ->orderBy('users.name', 'ASC')
+            ->where('user_doctor_details.user_id', '=', $id)
+            ->get();
+
+        $doctorList = [];
+        foreach($fetchDoctorList as $doctor) {
+            $doctorList[] = [
+                'name' => $doctor->user->name,
+                'address' => $doctor->user->address,
+                'image'=> $doctor->user->image,
+                'banner'=> $doctor->user->banner,
+                'price' => $doctor->price,
+                'description' => $doctor->description
+            ];
+        }
+        
+        return response()->json([
+            'status' => 'OK',
+            'results' => [
+                'doctor_list' => $doctorList
+            ]
+        ]);
+    }
+
+    public function bannerList(Request $request)
+    {
+        $token = $this::getCurrentToken($request);
+        $fetchBannerList = Banner::select([
+                'banners.*'
+            ])
+            ->orderBy('banners.sequence', 'ASC')
+            ->get();
+
+        $bannerList = [];
+        foreach($fetchBannerList as $banner) {
+            $bannerList[] = [
+                'sequence' => $banner->sequence,
+                'image' => asset('uploads/item/'.$banner->image)
+            ];
+        }
+        
+        return response()->json([
+            'status' => 'OK',
+            'results' => [
+                'banner_list' => $bannerList
             ]
         ]);
     }

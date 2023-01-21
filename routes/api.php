@@ -20,5 +20,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::prefix('pawcare')->group(function() {
     Route::post('/login', 'Api\ApiController@login');
     Route::post('/register', 'Api\ApiController@registerUser');
+    Route::post('/user/edit/{id}', 'Api\ApiController@editUser');
     Route::get('/doctor/list', 'Api\ApiController@doctorList');
+    Route::get('/doctor/detail/{id}', 'Api\ApiController@doctorDetail');
+    Route::get('/banner/list', 'Api\ApiController@bannerList');
 });
