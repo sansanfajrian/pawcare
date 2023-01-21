@@ -19,8 +19,8 @@ class UsersTableSeeder extends Seeder
             'password' => bcrypt('rootadmin'),
             'remember_token' => str_random(10),
             'created_at' => '2022-05-10',
-            'updated_at' => '2022-05-10'
-            'address' => 'Pawcare Admin'
+            'updated_at' => '2022-05-10',
+            'address' => 'Pawcare Admin',
         ]);
     }
 }
