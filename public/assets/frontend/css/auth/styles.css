@@ -104,7 +104,7 @@ header .main-menu{ display: inline-block; float: left; }
 
 header .main-menu > li{ float: left; }
 
-header .main-menu > li > a{ height: 60px; line-height: 60px; padding: 0 25px; border-right: 1px solid #eee; }
+header .main-menu > li > a{ height: 60px; line-height: 60px; padding: 0 25px; border-right: none !important; }
 
 header .main-menu > li > a:hover{  background: #eee; }
 
