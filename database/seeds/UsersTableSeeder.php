@@ -20,6 +20,7 @@ class UsersTableSeeder extends Seeder
             'remember_token' => str_random(10),
             'created_at' => '2022-05-10',
             'updated_at' => '2022-05-10'
+            'address' => 'Pawcare Admin'
         ]);
     }
 }
