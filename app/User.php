@@ -33,24 +33,15 @@ class User extends Authenticatable
     {
         return $this->belongsTo('App\Role');
     }
-    public function posts()
-    {
-        return $this->hasMany('App\Post');
-    }
 
     public function userDoctorDetails()
     {
         return $this->hasOne('App\UserDoctorDetail');
     }
 
-    public function favorite_posts()
+    public function consultations()
     {
-        return $this->belongsToMany('App\Post')->withTimestamps();
-    }
-
-    public function comments()
-    {
-        return $this->hasMany('App\Comment');
+        return $this->hasMany('App\Consultation');
     }
 
     public function scopeAuthors($query)

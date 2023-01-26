@@ -10,4 +10,10 @@ class UserDoctorDetail extends Model
     {
         return $this->belongsTo('App\User', 'user_id');
     }
+
+    public function consultations()
+    {
+        return $this->hasMany('App\Consultation');
+    }
 }
+

@@ -26,9 +26,6 @@ class Controller extends BaseController
     
     public function index()
     {
-        $sliders = Slider::all();
-        $items = Item::all();
-        $categories = Category::all();
-        return view('frontend.view', compact('sliders','items','categories'));
+        return view('frontend.view');
     }
 }

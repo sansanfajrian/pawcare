@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class RenameAlamatToAlamatUsers extends Migration
+class CreateReviewsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,12 @@ class RenameAlamatToAlamatUsers extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->renameColumn('Alamat', 'address');
+        Schema::create('reviews', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('consultation_id')->unsigned();
+            $table->integer('star');
+            $table->string('review');
+            $table->timestamps();
         });
     }
 
@@ -25,8 +29,6 @@ class RenameAlamatToAlamatUsers extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->renameColumn('address', 'Alamat');
-        });
+        Schema::dropIfExists('reviews');
     }
 }

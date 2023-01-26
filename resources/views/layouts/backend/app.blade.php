@@ -57,19 +57,6 @@
 <!-- Overlay For Sidebars -->
 <div class="overlay"></div>
 <!-- #END# Overlay For Sidebars -->
-<!-- Search Bar -->
-<div class="search-bar">
-    <form action="{{ route('search') }}">
-        <div class="search-icon">
-            <i class="material-icons">search</i>
-        </div>
-        <input type="text" name="query" placeholder="START TYPING...">
-        <div class="close-search">
-            <i class="material-icons">close</i>
-        </div>
-    </form>
-</div>
-<!-- #END# Search Bar -->
 <!-- Top Bar -->
     @include('layouts.backend.partial.topbar')
 <!-- #Top Bar -->

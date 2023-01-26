@@ -13,7 +13,7 @@ class CreateBannerTable extends Migration
      */
     public function up()
     {
-        Schema::create('banner', function (Blueprint $table) {
+        Schema::create('banners', function (Blueprint $table) {
             $table->increments('id');
             $table->string('image')->default('default.jpg');
             $table->integer('sequence');

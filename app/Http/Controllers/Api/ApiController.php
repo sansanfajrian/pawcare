@@ -6,6 +6,8 @@ use DB;
 use App\User;
 use App\UserDoctorDetail;
 use App\Banner;
+use App\Consultation;
+use App\Payment;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -136,6 +138,7 @@ class ApiController extends Controller
         foreach($fetchDoctorList as $doctor) {
             $doctorList[] = [
                 'id' => $doctor->user->id,
+                'user_doctor_detail_id' => $doctor->id,
                 'name' => $doctor->user->name,
                 'address' => $doctor->user->address,
                 'price' => $doctor->price,
@@ -167,6 +170,8 @@ class ApiController extends Controller
         $doctorList = [];
         foreach($fetchDoctorList as $doctor) {
             $doctorList[] = [
+                'id' => $doctor->user->id,
+                'user_doctor_detail_id' => $doctor->id,
                 'name' => $doctor->user->name,
                 'address' => $doctor->user->address,
                 'image'=> $doctor->user->image,
@@ -208,4 +213,95 @@ class ApiController extends Controller
             ]
         ]);
     }
+
+    public function consultation(Request $request)
+    {
+        $token = $this::getCurrentToken($request);
+		$user = User::where('id', $token->user_id)->first();
+		if(empty($user)) {
+			return response()->json([
+                'status' => 'FAIL',
+                'message' => 'Invalid User ID'
+            ]);
+		}
+
+        $isSuccess = false;
+
+        DB::beginTransaction();
+        try {
+            $message = "";
+            if(!$request->message){
+                $message = "-";
+            }else{
+                $message = $request->message;
+            }
+
+            $consultationId = Consultation::insertGetId([
+                'user_id' => $user->id,
+                'user_doctor_detail_id' => $request->user_doctor_detail_id,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+            DB::commit();
+            $isSuccess = true;
+        } catch (Exception $e) {
+            DB::rollback();
+            $isSuccess = false;
+        }
+
+        return response()->json([
+            'status' => $isSuccess ? 'OK' : 'FAIL',
+            'message' => $isSuccess ? 'Berhasil konsultasi dengan dokter!' : 'Gagal untuk konsultasi dengan dokter!'
+        ]);
+    }
+
+    public function payment(Request $request)
+    {
+        $token = $this::getCurrentToken($request);
+		$user = User::where('id', $token->user_id)->first();
+		if(empty($user)) {
+			return response()->json([
+                'status' => 'FAIL',
+                'message' => 'Invalid User ID'
+            ]);
+		}
+
+        $isSuccess = false;
+
+        DB::beginTransaction();
+        try {
+            $message = "";
+            if(!$request->message){
+                $message = "-";
+            }else{
+                $message = $request->message;
+            }
+
+            $paymentId = Payment::insertGetId([
+                'consultation_id' => $request->consultation_id,
+                'bank_name' => $request->bank_name,
+                'sender_name' => $request->sender_name,
+                'image' => $request->image,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+            $consultation_id = $request->consultation_id;
+            $consultation = Consultation::find($consultation_id);
+            $consultation->status = "Menunggu Persetujuan";
+            $consultation->save();
+            DB::commit();
+            $isSuccess = true;
+        } catch (Exception $e) {
+            DB::rollback();
+            $isSuccess = false;
+        }
+
+        return response()->json([
+            'status' => $isSuccess ? 'OK' : 'FAIL',
+            'message' => $isSuccess ? 'Berhasil mengirimkan bukti pembayaran!' : 'Gagal mengirimkan bukti pembayaran!'
+        ]);
+    }
+
 }

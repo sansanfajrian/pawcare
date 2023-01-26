@@ -51,54 +51,6 @@
                         <span>Banner</span>
                     </a>
                 </li>
-                <li class="{{ Request::is('admin/tag*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.tag.index') }}">
-                        <i class="material-icons">label</i>
-                        <span>Tag</span>
-                    </a>
-                </li>
-                <li class="{{ Request::is('admin/category*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.category.index') }}">
-                        <i class="material-icons">apps</i>
-                        <span>Category</span>
-                    </a>
-                </li>
-                <li class="{{ Request::is('admin/post*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.post.index') }}">
-                        <i class="material-icons">library_books</i>
-                        <span>Posts</span>
-                    </a>
-                </li>
-                <li class="{{ Request::is('admin/pending/post') ? 'active' : '' }}">
-                    <a href="{{ route('admin.post.pending') }}">
-                        <i class="material-icons">library_books</i>
-                        <span>Pending Posts</span>
-                    </a>
-                </li>
-                <li class="{{ Request::is('admin/favorite') ? 'active' : '' }}">
-                    <a href="{{ route('admin.favorite.index') }}">
-                        <i class="material-icons">favorite</i>
-                        <span>Favorite Posts</span>
-                    </a>
-                </li>
-                <li class="{{ Request::is('admin/comments') ? 'active' : '' }}">
-                    <a href="{{ route('admin.comment.index') }}">
-                        <i class="material-icons">comment</i>
-                        <span>Comments</span>
-                    </a>
-                </li>
-                <li class="{{ Request::is('admin/authors') ? 'active' : '' }}">
-                    <a href="{{ route('admin.author.index') }}">
-                        <i class="material-icons">account_circle</i>
-                        <span>Authors</span>
-                    </a>
-                </li>
-                <li class="{{ Request::is('admin/subscriber') ? 'active' : '' }}">
-                    <a href="{{ route('admin.subscriber.index') }}">
-                        <i class="material-icons">subscriptions</i>
-                        <span>Subscribers</span>
-                    </a>
-                </li>
                 <li class="header">System</li>
 
                 <li class="{{ Request::is('admin/settings') ? 'active' : '' }}">
@@ -125,25 +77,6 @@
                     <a href="{{ route('author.dashboard') }}">
                         <i class="material-icons">dashboard</i>
                         <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="{{ Request::is('author/post*') ? 'active' : '' }}">
-                    <a href="{{ route('author.post.index') }}">
-                        <i class="material-icons">library_books</i>
-                        <span>Posts</span>
-                    </a>
-                </li>
-                <li class="{{ Request::is('author/favorite') ? 'active' : '' }}">
-                    <a href="{{ route('author.favorite.index') }}">
-                        <i class="material-icons">favorite</i>
-                        <span>Favorite Posts</span>
-                    </a>
-                </li>
-
-                <li class="{{ Request::is('author/comments') ? 'active' : '' }}">
-                    <a href="{{ route('author.comment.index') }}">
-                        <i class="material-icons">comment</i>
-                        <span>Comments</span>
                     </a>
                 </li>
 

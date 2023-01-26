@@ -23,11 +23,6 @@
             <div class="col-lg-4 col-md-6">
                 <div class="footer-section">
                     
-                    <ul>
-                        @foreach($categories as $category)
-                            <li><a href="{{ route('category.posts',$category->slug) }}">{{ $category->name }}</a></li>
-                        @endforeach
-                    </ul>
                 </div><!-- footer-section -->
             </div><!-- col-lg-4 col-md-6 -->
 

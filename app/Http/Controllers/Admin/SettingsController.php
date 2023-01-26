@@ -50,7 +50,6 @@ class SettingsController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->image = $imageName;
-        $user->about = $request->about;
         $user->save();
         Toastr::success('Profile Successfully Updated :)','Success');
         return redirect()->back();
