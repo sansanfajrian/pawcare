@@ -76,7 +76,7 @@ class BannerController extends Controller
         $banner->sequence = $request->sequence;
         $banner->image = $imagename;
         $banner->save();
-        Toastr::success('Banner Successfully Saved :)' ,'Success');
+        Toastr::success('Banner Successfully Saved' ,'Success');
         return redirect()->route('admin.banner.index');
 
     }

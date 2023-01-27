@@ -8,9 +8,14 @@ use App\UserDoctorDetail;
 use App\Banner;
 use App\Consultation;
 use App\Payment;
+use App\Review;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Validator;
 
 class ApiController extends Controller
 {
@@ -95,16 +100,54 @@ class ApiController extends Controller
 
         $isSuccess = false;
 
+        
+        $this->validate($request,[
+            'image' => 'mimes:jpeg,bmp,png,jpg',
+            'banner' => 'mimes:jpeg,bmp,png,jpg',
+        ]);
+
         DB::beginTransaction();
         try{
+            $slug = str_slug($request->name);
+            $image = $request->file('image');
+            if (isset($image))
+            {
+                $currentDate = Carbon::now()->toDateString();
+                $imagename = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
+    
+                if (!file_exists('uploads/profile'))
+                {
+                    mkdir('uploads/profile',0777,true);
+                }
+                $image->move('uploads/profile',$imagename);
+    
+            } else {
+                $imagename =  "default.png";
+            }
+            
+            $banner = $request->file('banner');
+            if (isset($banner))
+            {
+                $currentDate = Carbon::now()->toDateString();
+                $bannername = $slug.'-'.$currentDate.'-'.uniqid().'.'.$banner->getClientOriginalExtension();
+    
+                if (!file_exists('uploads/banner'))
+                {
+                    mkdir('uploads/banner',0777,true);
+                }
+                $banner->move('uploads/banner',$bannername);
+    
+            } else {
+                $bannername =  "default.png";
+            }
             $user = User::find($id);
             $user->update([
                 'name' => $request->name,
                 'email' => $request->email,
                 'address' => $request->address,
                 'phone' => $request->phone,
-                'image' => $request->image,
-                'banner' => $request->banner
+                'image' => $imagename,
+                'banner' => $bannername
             ]);
             DB::commit();
             $isSuccess = true;
@@ -174,8 +217,8 @@ class ApiController extends Controller
                 'user_doctor_detail_id' => $doctor->id,
                 'name' => $doctor->user->name,
                 'address' => $doctor->user->address,
-                'image'=> $doctor->user->image,
-                'banner'=> $doctor->user->banner,
+                'image'=> asset('uploads/profile/'.$doctor->user->image),
+                'banner'=> asset('uploads/banner/'.$doctor->user->banner),
                 'price' => $doctor->price,
                 'description' => $doctor->description
             ];
@@ -202,7 +245,7 @@ class ApiController extends Controller
         foreach($fetchBannerList as $banner) {
             $bannerList[] = [
                 'sequence' => $banner->sequence,
-                'image' => asset('uploads/item/'.$banner->image)
+                'image' => asset('uploads/banner/'.$banner->image)
             ];
         }
         
@@ -235,10 +278,11 @@ class ApiController extends Controller
             }else{
                 $message = $request->message;
             }
-
+            $doctor = UserDoctorDetail::where('id', $request->user_doctor_detail_id)->first();
+            
             $consultationId = Consultation::insertGetId([
                 'user_id' => $user->id,
-                'user_doctor_detail_id' => $request->user_doctor_detail_id,
+                'user_doctor_detail_id' => $doctor->id,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
@@ -253,6 +297,43 @@ class ApiController extends Controller
         return response()->json([
             'status' => $isSuccess ? 'OK' : 'FAIL',
             'message' => $isSuccess ? 'Berhasil konsultasi dengan dokter!' : 'Gagal untuk konsultasi dengan dokter!'
+        ]);
+    }
+
+    public function consultationList(Request $request)
+    {
+        $token = $this::getCurrentToken($request);
+		$user = User::where('id', $token->user_id)->first();
+		if(empty($user)) {
+			return response()->json([
+                'status' => 'FAIL',
+                'message' => 'Invalid User ID'
+            ]);
+		}
+
+        $fetchConsultationList = Consultation::select([
+                'consultations.*'
+            ])
+            ->orderBy('consultations.created_at', 'DESC')
+            ->where('consultations.user_id', '=', $user->id)
+            ->get();
+
+        $consultationList = [];
+        foreach($fetchConsultationList as $consultation) {
+            $consultationList[] = [
+                'doctor' => $consultation->userDoctorDetail->user->name,
+                'price' => $consultation->userDoctorDetail->price,
+                'status'=> $consultation->status,
+                'created_at'=> $consultation->created_at->format('d-m-Y'),
+                'updated_at'=> $consultation->updated_at->format('d-m-Y')
+            ];
+        }
+        
+        return response()->json([
+            'status' => 'OK',
+            'results' => [
+                'banner_list' => $consultationList
+            ]
         ]);
     }
 
@@ -278,11 +359,46 @@ class ApiController extends Controller
                 $message = $request->message;
             }
 
+            $this->validate($request,[
+                'image' => 'mimes:jpeg,bmp,png,jpg'
+            ]);
+            // get form image
+            $image = $request->file('image');
+            $slug = str_slug($request->sender_name);
+            if (isset($image))
+            {
+    //            make unique name for image
+                $currentDate = Carbon::now()->toDateString();
+                $imagename = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
+    //            check banner dir is exists
+                /*if (!Storage::disk('public')->exists('banner'))
+                {
+                    Storage::disk('public')->makeDirectory('banner');
+                }
+    //            delete old image
+                if (Storage::disk('public')->exists('banner/'.$banner->image))
+                {
+                    Storage::disk('public')->delete('banner/'.$banner->image);
+                }
+    //            resize image for banner and upload
+                $bannerimage = Image::make($image)->resize(1600,479)->stream();
+                Storage::disk('public')->put('banner/'.$imagename,$bannerimage);*/
+    
+                if (!file_exists('uploads/payments'))
+                {
+                    mkdir('uploads/payments',0777,true);
+                }
+                $image->move('uploads/payments',$imagename);
+    
+            } else {
+                $imagename = "default.png";
+            }
+
             $paymentId = Payment::insertGetId([
                 'consultation_id' => $request->consultation_id,
                 'bank_name' => $request->bank_name,
                 'sender_name' => $request->sender_name,
-                'image' => $request->image,
+                'image' => $imagename,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
@@ -303,5 +419,69 @@ class ApiController extends Controller
             'message' => $isSuccess ? 'Berhasil mengirimkan bukti pembayaran!' : 'Gagal mengirimkan bukti pembayaran!'
         ]);
     }
+
+    public function review(Request $request)
+    {
+        $token = $this::getCurrentToken($request);
+		$user = User::where('id', $token->user_id)->first();
+		if(empty($user)) {
+			return response()->json([
+                'status' => 'FAIL',
+                'message' => 'Invalid User ID'
+            ]);
+		}
+
+        $isSuccess = false;
+
+        DB::beginTransaction();
+        try {
+            $message = "";
+            if(!$request->message){
+                $message = "-";
+            }else{
+                $message = $request->message;
+            }
+
+            $reviewId = Review::insertGetId([
+                'consultation_id' => $request->consultation_id,
+                'star' => $request->star,
+                'review' => $request->review,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+            $consultation_id = $request->consultation_id;
+            $consultation = Consultation::find($consultation_id);
+            $consultation->status = "Done";
+            $consultation->save();
+            DB::commit();
+            $isSuccess = true;
+
+            $fetchReviewList = Review::where('id', $reviewId)->get();
+
+            $reviewList = [];
+            foreach($fetchReviewList as $rev) {
+                $reviewList[] = [
+                    'id' => $rev->id,
+                    'consultation_id'=> $rev->consultation_id,
+                    'star'=> $rev->star,
+                    'review' => $rev->review
+                ];
+            }
+        } catch (Exception $e) {
+            DB::rollback();
+            $isSuccess = false;
+        }
+
+        return response()->json([
+            'status' => $isSuccess ? 'OK' : 'FAIL',
+            'message' => $isSuccess ? 'Berhasil mengirimkan review!' : 'Gagal mengirimkan review!',
+            'result' => [
+                'review' => $reviewList,
+            ]
+        ]);
+    }
+
+    
 
 }

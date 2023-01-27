@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Brian2694\Toastr\Facades\Toastr;
 
 class RegisterController extends Controller
 {
@@ -84,6 +85,7 @@ class RegisterController extends Controller
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
+            Toastr::success('Account succesfuly created, please wait until our admin approve your account','Success');
             return view('auth.register');
         }
     }

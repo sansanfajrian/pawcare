@@ -51,6 +51,13 @@
                         <span>Banner</span>
                     </a>
                 </li>
+                <li class="{{ Request::is('admin/payment') ? 'active' : '' }}">
+                    <a href="{{ route('admin.payment.index') }}">
+                        <i class="material-icons">payments</i>
+                        <span>Payment</span>
+                    </a>
+                </li>
+
                 <li class="header">System</li>
 
                 <li class="{{ Request::is('admin/settings') ? 'active' : '' }}">
@@ -79,7 +86,12 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
-
+                <li class="{{ Request::is('author/payment') ? 'active' : '' }}">
+                    <a href="{{ route('author.payment.index') }}">
+                        <i class="material-icons">payments</i>
+                        <span>Payment</span>
+                    </a>
+                </li>
                 <li class="header">System</li>
                 <li class="{{ Request::is('author/settings') ? 'active' : '' }}">
                     <a href="{{ route('author.settings') }}">

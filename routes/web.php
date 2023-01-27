@@ -11,7 +11,9 @@
 |
 */
 
-Route::get('/', 'HomeController@index')->name('home');
+Route::get('/', function () {
+    return Redirect::to('login');
+});
 
 Route::get('profile/{username}','AuthorController@profile')->name('author.profile');
 
@@ -26,6 +28,7 @@ Route::group(['as'=>'admin.','prefix'=>'admin','namespace'=>'Admin','middleware'
     Route::put('password-update','SettingsController@updatePassword')->name('password.update');
 
     Route::resource('banner','BannerController');
+    Route::resource('payment','PaymentController');
 });
 
 Route::group(['as'=>'author.','prefix'=>'author','namespace'=>'Author','middleware'=>['auth','author']], function (){
@@ -34,4 +37,8 @@ Route::group(['as'=>'author.','prefix'=>'author','namespace'=>'Author','middlewa
     Route::get('settings','SettingsController@index')->name('settings');
     Route::put('profile-update','SettingsController@updateProfile')->name('profile.update');
     Route::put('password-update','SettingsController@updatePassword')->name('password.update');
+
+    Route::resource('payment','PaymentController');
+    Route::post('payment/status/{id}','PaymentController@status')->name('payment.status');
+    Route::post('payment/status_deny/{id}','PaymentController@statusDeny')->name('payment.status_deny');
 });

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Author;
 
 use App\User;
+use App\UserDoctorDetail;
 use Brian2694\Toastr\Facades\Toastr;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ class SettingsController extends Controller
 {
     public function index()
     {
-        return view('admin.settings');
+        return view('author.settings');
     }
 
     public function updateProfile(Request $request)
@@ -24,11 +25,13 @@ class SettingsController extends Controller
         $this->validate($request,[
             'name' => 'required',
             'email' => 'required|email',
-            'image' => 'required|image',
+            'image' => 'mimes:jpeg,bmp,png,jpg',
+            'banner' => 'mimes:jpeg,bmp,png,jpg'
         ]);
+        
+        $user = User::findOrFail(Auth::id());
         $image = $request->file('image');
         $slug = str_slug($request->name);
-        $user = User::findOrFail(Auth::id());
         if (isset($image))
         {
             $currentDate = Carbon::now()->toDateString();
@@ -46,11 +49,39 @@ class SettingsController extends Controller
         } else {
             $imageName = $user->image;
         }
+
+        $banner = $request->file('banner');
+        $slug = str_slug($request->name);
+        if (isset($banner))
+        {
+            $currentDate = Carbon::now()->toDateString();
+            $bannerName = $slug.'-'.$currentDate.'-'.uniqid().'.'.$banner->getClientOriginalExtension();
+            if (!Storage::disk('public')->exists('uploads/banner'))
+            {
+                Storage::disk('public')->makeDirectory('uploads/banner');
+            }
+//            Delete old image form profile folder
+            if (Storage::disk('public')->exists('uploads/banner/'.$user->banner))
+            {
+                Storage::disk('public')->delete('uploads/banner/'.$user->banner);
+            }
+            $banner->move('uploads/banner',$bannerName);
+        } else {
+            $bannerName = $user->image;
+        }
         $user->name = $request->name;
         $user->email = $request->email;
         $user->image = $imageName;
-        $user->save();
-        Toastr::success('Profile Successfully Updated','Success');
+        $user->banner = $bannerName;
+        $user->address = $request->address;
+        $user->phone = $request->phone;
+        if($user->save()){
+            $doctor = UserDoctorDetail::where('user_id', $user->id)->first();
+            $doctor->price = $request->price;
+            $doctor->description = $request->description;
+            $doctor->save();
+        }
+        Toastr::success('Profile Successfully Updated :)','Success');
         return redirect()->back();
     }
 

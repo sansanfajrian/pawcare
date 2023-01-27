@@ -19,6 +19,9 @@ class CreateReviewsTable extends Migration
             $table->integer('star');
             $table->string('review');
             $table->timestamps();
+            $table->foreign('consultation_id')
+                ->references('id')->on('consultations')
+                ->onDelete('cascade');
         });
     }
 

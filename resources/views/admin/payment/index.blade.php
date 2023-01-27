@@ -1,6 +1,6 @@
 @extends('layouts.backend.app')
 
-@section('title','Banner')
+@section('title','Payment')
 
 @push('css')
     <!-- JQuery DataTable Css -->
@@ -9,20 +9,14 @@
 
 @section('content')
     <div class="container-fluid">
-        <div class="block-header">
-            <a class="btn btn-primary waves-effect" href="{{ route('admin.banner.create') }}">
-                <i class="material-icons">add</i>
-                <span>Add New Banner</span>
-            </a>
-        </div>
         <!-- Exportable Table -->
         <div class="row clearfix">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="card">
                     <div class="header">
                         <h2>
-                            ALL BANNERS
-                            <span class="badge bg-blue">{{ $banners->count() }}</span>
+                            ALL PAYMENTS
+                            <span class="badge bg-blue">{{ $payments->count() }}</span>
                         </h2>
                     </div>
                     <div class="body">
@@ -31,8 +25,10 @@
                                 <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Sequence</th>
-                                    <th>Image</th>
+                                    <th>Doctor</th>
+                                    <th>User</th>
+                                    <th>Bank Name</th>
+                                    <th>Sender Name</th>
                                     <th>Created At</th>
                                     <th>Updated At</th>
                                     <th>Action</th>
@@ -41,33 +37,29 @@
                                 <tfoot>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Sequence</th>
-                                    <th>Image</th>
+                                    <th>Doctor</th>
+                                    <th>User</th>
+                                    <th>Bank Name</th>
+                                    <th>Sender Name</th>
                                     <th>Created At</th>
                                     <th>Updated At</th>
                                     <th>Action</th>
                                 </tr>
                                 </tfoot>
                                 <tbody>
-                                    @foreach($banners as $key=>$banner)
+                                    @foreach($payments as $key=>$payment)
                                         <tr>
                                             <td>{{ $key + 1 }}</td>
-                                            <td>{{ $banner->sequence }}</td>
-                                            <td><img class="img-responsive img-thumbnail" src="{{ asset('uploads/banner/'.$banner->image) }}"
-                                                     style="height: 100px; width: 100px;"></td></td>
-                                            <td>{{ $banner->created_at }}</td>
-                                            <td>{{ $banner->updated_at }}</td>
+                                            <td>{{ $payment->consultation->userDoctorDetail->user->name}}</td>
+                                            <td>{{ $payment->consultation->user->name}}</td>
+                                            <td>{{ $payment->bank_name }}</td>
+                                            <td>{{ $payment->sender_name }}</td>
+                                            <td>{{ $payment->created_at }}</td>
+                                            <td>{{ $payment->updated_at }}</td>
                                             <td class="text-center">
-                                                <a href="{{ route('admin.banner.edit',$banner->id) }}" class="btn btn-info waves-effect">
-                                                    <i class="material-icons">edit</i>
+                                                <a href="{{ route('admin.payment.show',$payment->id) }}" class="btn btn-info waves-effect">
+                                                    <i class="material-icons">details</i>
                                                 </a>
-                                                <button class="btn btn-danger waves-effect" type="button" onclick="deleteBanner({{ $banner->id }})">
-                                                    <i class="material-icons">delete</i>
-                                                </button>
-                                                <form id="delete-form-{{ $banner->id }}" action="{{ route('admin.banner.destroy',$banner->id) }}" method="POST" style="display: none;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                </form>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -97,7 +89,7 @@
     <script src="{{ asset('assets/backend/js/pages/tables/jquery-datatable.js') }}"></script>
     <script src="https://unpkg.com/sweetalert2@7.19.1/dist/sweetalert2.all.js"></script>
     <script type="text/javascript">
-        function deleteBanner(id) {
+        function deletepayment(id) {
             swal({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",

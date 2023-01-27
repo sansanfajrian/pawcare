@@ -20,6 +20,9 @@ class CreatePaymentsTable extends Migration
             $table->string('sender_name');
             $table->string('image')->default('default.png');
             $table->timestamps();
+            $table->foreign('consultation_id')
+                ->references('id')->on('consultations')
+                ->onDelete('cascade');
         });
     }
 
