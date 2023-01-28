@@ -177,8 +177,26 @@ class ApiController extends Controller
             'user_doctor_details.*',
             'users.name AS name'
         ])
-            ->leftJoin('users', 'users.id', 'user_doctor_details.user_id')
-            ->orderBy('users.name', 'ASC');
+            ->leftJoin('users', 'users.id', 'user_doctor_details.user_id');
+        # order by average review ratings
+        $reviewsWithConsultation = DB::table('consultations as c')
+        ->select(
+            DB::raw('AVG(r.star) as avg_star'), 
+            DB::raw('COUNT(r.id) AS consultation_count'),
+            'c.user_doctor_detail_id as doctor_id')
+        ->groupBy('c.user_doctor_detail_id')
+        ->join('reviews as r', 'r.consultation_id', 'c.id');
+        $fetchDoctorList->leftJoinSub($reviewsWithConsultation, 'rev_sub', 'rev_sub.doctor_id', 'user_doctor_details.id')
+        ->addSelect(
+            DB::raw(
+                "CASE WHEN rev_sub.avg_star is null THEN '-' ".
+                "ELSE rev_sub.avg_star ".
+                "END as ratings"
+            ),
+            'consultation_count'
+        )
+        ->orderBy('ratings', 'desc')
+        ->orderBy('user_doctor_details.created_at', 'asc');
         # handling search parameter
         if ($request->has('search')) {
             $search = $request->search;
@@ -197,7 +215,9 @@ class ApiController extends Controller
                 'name' => $doctor->user->name,
                 'address' => $doctor->user->address,
                 'price' => $doctor->price,
-                'description' => $doctor->description
+                'description' => $doctor->description,
+                'avg_ratings' => $doctor->ratings,
+                'consultation_count' => $doctor->consultation_count
             ];
         }
 
