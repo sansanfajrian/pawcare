@@ -62,16 +62,16 @@ class ApiController extends Controller
             }
 
             $userId = User::insertGetId([
-                    'name' => $request->name,
-                    'role_id' => 3,
-                    'email' => $request->email,
-                    'gender' => $request->gender,
-                    'address' => $request->address,
-                    'password' => Hash::make($request->password),
-                    'phone' => $request->phone,
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
+                'name' => $request->name,
+                'role_id' => 3,
+                'email' => $request->email,
+                'gender' => $request->gender,
+                'address' => $request->address,
+                'password' => Hash::make($request->password),
+                'phone' => $request->phone,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
 
             DB::commit();
             $isSuccess = true;
@@ -90,17 +90,17 @@ class ApiController extends Controller
     public function editUser(Request $request, $id)
     {
         $token = $this::getCurrentToken($request);
-		$user = User::where('id', $token->user_id)->first();
-		if(empty($user)) {
-			return response()->json([
+        $user = User::where('id', $token->user_id)->first();
+        if(empty($user)) {
+            return response()->json([
                 'status' => 'FAIL',
                 'message' => 'Invalid User ID'
             ]);
-		}
+        }
 
         $isSuccess = false;
 
-        
+
         $this->validate($request,[
             'image' => 'mimes:jpeg,bmp,png,jpg',
             'banner' => 'mimes:jpeg,bmp,png,jpg',
@@ -114,29 +114,29 @@ class ApiController extends Controller
             {
                 $currentDate = Carbon::now()->toDateString();
                 $imagename = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
-    
+
                 if (!file_exists('uploads/profile'))
                 {
                     mkdir('uploads/profile',0777,true);
                 }
                 $image->move('uploads/profile',$imagename);
-    
+
             } else {
                 $imagename =  "default.png";
             }
-            
+
             $banner = $request->file('banner');
-            if (isset($banner))
+            if (isset($banner)) 
             {
                 $currentDate = Carbon::now()->toDateString();
                 $bannername = $slug.'-'.$currentDate.'-'.uniqid().'.'.$banner->getClientOriginalExtension();
-    
-                if (!file_exists('uploads/banner'))
+
+                if (!file_exists('uploads/banner')) 
                 {
                     mkdir('uploads/banner',0777,true);
                 }
                 $banner->move('uploads/banner',$bannername);
-    
+
             } else {
                 $bannername =  "default.png";
             }
@@ -151,10 +151,10 @@ class ApiController extends Controller
             ]);
             DB::commit();
             $isSuccess = true;
-        }
+        } 
         catch(Exception $e){
             DB::rollback();
-            $isSuccess = false; 
+            $isSuccess = false;
         }
 
         return response()->json([
@@ -168,15 +168,27 @@ class ApiController extends Controller
 
     public function doctorList(Request $request)
     {
+        $request->validate([
+            'search' => 'nullable'
+        ]);
+
         $token = $this::getCurrentToken($request);
         $fetchDoctorList = UserDoctorDetail::select([
-                'user_doctor_details.*',
-                'users.name AS name'
-            ])
+            'user_doctor_details.*',
+            'users.name AS name'
+        ])
             ->leftJoin('users', 'users.id', 'user_doctor_details.user_id')
-            ->orderBy('users.name', 'ASC')
-            ->get();
-
+            ->orderBy('users.name', 'ASC');
+        # handling search parameter
+        if ($request->has('search')) {
+            $search = $request->search;
+            # searchable attributes (name, address, price, description)
+            $fetchDoctorList->orWhere('name', 'like', "%$search%")
+                ->orWhere('users.name', 'like', "%$search%")
+                ->orWhere('users.address', 'like', "%$search%")
+                ->orWhere('user_doctor_details.description', 'like', "%$search%");
+        }
+        $fetchDoctorList = $fetchDoctorList->get();
         $doctorList = [];
         foreach($fetchDoctorList as $doctor) {
             $doctorList[] = [
@@ -188,7 +200,7 @@ class ApiController extends Controller
                 'description' => $doctor->description
             ];
         }
-        
+
         return response()->json([
             'status' => 'OK',
             'results' => [
@@ -201,10 +213,10 @@ class ApiController extends Controller
     {
         $token = $this::getCurrentToken($request);
         $fetchDoctorList = UserDoctorDetail::select([
-                'user_doctor_details.*',
-                'users.name AS name',
-                'users.address AS address'
-            ])
+            'user_doctor_details.*',
+            'users.name AS name',
+            'users.address AS address'
+        ])
             ->leftJoin('users', 'users.id', 'user_doctor_details.user_id')
             ->orderBy('users.name', 'ASC')
             ->where('user_doctor_details.user_id', '=', $id)
@@ -223,7 +235,7 @@ class ApiController extends Controller
                 'description' => $doctor->description
             ];
         }
-        
+
         return response()->json([
             'status' => 'OK',
             'results' => [
@@ -236,8 +248,8 @@ class ApiController extends Controller
     {
         $token = $this::getCurrentToken($request);
         $fetchBannerList = Banner::select([
-                'banners.*'
-            ])
+            'banners.*'
+        ])
             ->orderBy('banners.sequence', 'ASC')
             ->get();
 
@@ -248,7 +260,7 @@ class ApiController extends Controller
                 'image' => asset('uploads/banner/'.$banner->image)
             ];
         }
-        
+
         return response()->json([
             'status' => 'OK',
             'results' => [
@@ -260,13 +272,13 @@ class ApiController extends Controller
     public function consultation(Request $request)
     {
         $token = $this::getCurrentToken($request);
-		$user = User::where('id', $token->user_id)->first();
-		if(empty($user)) {
-			return response()->json([
+        $user = User::where('id', $token->user_id)->first();
+        if(empty($user)) {
+            return response()->json([
                 'status' => 'FAIL',
                 'message' => 'Invalid User ID'
             ]);
-		}
+        }
 
         $isSuccess = false;
 
@@ -279,7 +291,7 @@ class ApiController extends Controller
                 $message = $request->message;
             }
             $doctor = UserDoctorDetail::where('id', $request->user_doctor_detail_id)->first();
-            
+
             $consultationId = Consultation::insertGetId([
                 'user_id' => $user->id,
                 'user_doctor_detail_id' => $doctor->id,
@@ -302,22 +314,39 @@ class ApiController extends Controller
 
     public function consultationList(Request $request)
     {
+        $request->validate([
+            'search' => 'nullable'
+        ]);
         $token = $this::getCurrentToken($request);
-		$user = User::where('id', $token->user_id)->first();
-		if(empty($user)) {
-			return response()->json([
+        $user = User::where('id', $token->user_id)->first();
+        if(empty($user)) {
+            return response()->json([
                 'status' => 'FAIL',
                 'message' => 'Invalid User ID'
             ]);
-		}
+        }
 
         $fetchConsultationList = Consultation::select([
-                'consultations.*'
-            ])
+            'consultations.*'
+        ])
             ->orderBy('consultations.created_at', 'DESC')
-            ->where('consultations.user_id', '=', $user->id)
-            ->get();
-
+            ->where('consultations.user_id', '=', $user->id);
+        # handling search parameters
+        if ($request->has('search')) {
+            # search variable assignment
+            $search = $request->search;
+            # get the detail of the doctor with users & user_doctor_details attributes
+            $doctors = DB::table('user_doctor_details as ud')
+                ->select('u.name as doctor_name', 'ud.id as sub_id')
+                ->join('users as u', 'u.id', 'ud.user_id');
+            # joined doctors with the consultation query
+            # in order not to break the where clause logic, the search values need to be in brackets
+            $fetchConsultationList->joinSub($doctors, 'd_sub', 'd_sub.sub_id', 'consultations.user_doctor_detail_id')
+                ->whereRaw(
+                    "(d_sub.doctor_name like '%$search%' OR consultations.status like '%$search%')"
+                );
+        }
+        $fetchConsultationList = $fetchConsultationList->get();
         $consultationList = [];
         foreach($fetchConsultationList as $consultation) {
             $consultationList[] = [
@@ -328,7 +357,7 @@ class ApiController extends Controller
                 'updated_at'=> $consultation->updated_at->format('d-m-Y')
             ];
         }
-        
+
         return response()->json([
             'status' => 'OK',
             'results' => [
@@ -340,13 +369,13 @@ class ApiController extends Controller
     public function payment(Request $request)
     {
         $token = $this::getCurrentToken($request);
-		$user = User::where('id', $token->user_id)->first();
-		if(empty($user)) {
-			return response()->json([
+        $user = User::where('id', $token->user_id)->first();
+        if(empty($user)) {
+            return response()->json([
                 'status' => 'FAIL',
                 'message' => 'Invalid User ID'
             ]);
-		}
+        }
 
         $isSuccess = false;
 
@@ -365,12 +394,12 @@ class ApiController extends Controller
             // get form image
             $image = $request->file('image');
             $slug = str_slug($request->sender_name);
-            if (isset($image))
+            if (isset($image)) 
             {
-    //            make unique name for image
+                //            make unique name for image
                 $currentDate = Carbon::now()->toDateString();
                 $imagename = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
-    //            check banner dir is exists
+                //            check banner dir is exists
                 /*if (!Storage::disk('public')->exists('banner'))
                 {
                     Storage::disk('public')->makeDirectory('banner');
@@ -383,13 +412,13 @@ class ApiController extends Controller
     //            resize image for banner and upload
                 $bannerimage = Image::make($image)->resize(1600,479)->stream();
                 Storage::disk('public')->put('banner/'.$imagename,$bannerimage);*/
-    
-                if (!file_exists('uploads/payments'))
+
+                if (!file_exists('uploads/payments')) 
                 {
                     mkdir('uploads/payments',0777,true);
                 }
                 $image->move('uploads/payments',$imagename);
-    
+
             } else {
                 $imagename = "default.png";
             }
@@ -423,13 +452,13 @@ class ApiController extends Controller
     public function review(Request $request)
     {
         $token = $this::getCurrentToken($request);
-		$user = User::where('id', $token->user_id)->first();
-		if(empty($user)) {
-			return response()->json([
+        $user = User::where('id', $token->user_id)->first();
+        if(empty($user)) {
+            return response()->json([
                 'status' => 'FAIL',
                 'message' => 'Invalid User ID'
             ]);
-		}
+        }
 
         $isSuccess = false;
 
@@ -482,6 +511,6 @@ class ApiController extends Controller
         ]);
     }
 
-    
 
+    
 }
