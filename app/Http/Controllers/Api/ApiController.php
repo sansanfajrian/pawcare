@@ -240,7 +240,7 @@ class ApiController extends Controller
                 'image' => asset('uploads/profile/'.$doctor->user->image),
                 'price' => $doctor->price,
                 'avg_ratings' => $doctor->ratings,
-                'consultation_count' => $doctor->consultation_count
+                'consultation_count' => $doctor->consultation_count ?? 0
             ];
         }
 
@@ -295,7 +295,7 @@ class ApiController extends Controller
                 'price' => $doctor->price,
                 'description' => $doctor->description,
                 'avg_ratings' => $doctor->ratings,
-                'consultation_count' => $doctor->consultation_count
+                'consultation_count' => $doctor->consultation_count ?? 0
             ];
         }
 
