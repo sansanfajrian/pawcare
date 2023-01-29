@@ -23,6 +23,15 @@ Auth::routes();
 Route::group(['as'=>'admin.','prefix'=>'admin','namespace'=>'Admin','middleware'=>['auth','admin']], function (){
     Route::get('dashboard','DashboardController@index')->name('dashboard');
 
+    Route::group([
+        'prefix' => 'approvals',
+        'as' => 'approvals.'
+    ],
+    function (){
+        Route::get('','ApprovalController@indexDoctors')->name('index');
+        Route::put('approve','ApprovalController@approve')->name('approve');
+    });
+
     Route::get('settings','SettingsController@index')->name('settings');
     Route::put('profile-update','SettingsController@updateProfile')->name('profile.update');
     Route::put('password-update','SettingsController@updatePassword')->name('password.update');

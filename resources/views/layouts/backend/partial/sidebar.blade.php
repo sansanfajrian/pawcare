@@ -44,6 +44,11 @@
                         <i class="material-icons">dashboard</i>
                         <span>Dashboard</span>
                     </a>
+                <li class="{{ Request::is('admin/approvals') ? 'active' : '' }}">
+                    <a href="{{ route('admin.approvals.index') }}">
+                        <i class="material-icons">approval</i>
+                        <span>Doctor Approvals</span>
+                    </a>
                 </li>
                 <li class="{{ Request::is('admin/banner') ? 'active' : '' }}">
                     <a href="{{ route('admin.banner.index') }}">

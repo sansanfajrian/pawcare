@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\AccountApproval;
 use App\User;
 use App\UserDoctorDetail;
 use App\Http\Controllers\Controller;
@@ -39,8 +40,9 @@ class RegisterController extends Controller
      * @return void
      */
 
-    public function __construct(){
-       $this->middleware('guest');
+    public function __construct()
+    {
+        $this->middleware('guest');
     }
 
     /**
@@ -67,6 +69,7 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+
         $user = new User();
         $user->name = $data['name'];
         $user->email = $data['email'];
@@ -76,18 +79,25 @@ class RegisterController extends Controller
         $user->phone = $data['phone'];
         $user->created_at = date('Y-m-d H:i:s');
         $user->updated_at = date('Y-m-d H:i:s');
-        
-        if($user->save()){
+
+        if ($user->save()) {
             UserDoctorDetail::insertGetId([
                 'user_id' => $user->id,
                 'description' => $data['description'],
                 'price' => $data['price'],
+                'is_approved' => false,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
-            Toastr::success('Account succesfuly created, please wait until our admin approve your account','Success');
+
+            # create doctor approval
+            $approval = new AccountApproval();
+            $approval->approver_id = null;
+            $approval->requester_id = $user->id;
+            $approval->status = 0;
+            $approval->save();
+            Toastr::success('Account succesfuly created, please wait until our admin approve your account', 'Success');
             return view('auth.register');
         }
     }
-
 }

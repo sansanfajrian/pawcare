@@ -3,8 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
- 
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -12,14 +13,28 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    
+
     public function boot(UrlGenerator $url)
     {
-        if(env('REDIRECT_HTTPS')) {
+        if (env('REDIRECT_HTTPS')) {
             $url->formatScheme('https');
         }
+
+        Blade::directive('convertStatus', function ($status) {
+            $label = '';
+            switch ($status) {
+                case 1:
+                    $label = "Approved";
+                    break;
+
+                default:
+                    $label = "Not Approved";
+                    break;
+            }
+            return   "<?php echo '$label'; ?>";
+        });
     }
- 
+
     /**
      * Register any application services.
      *
@@ -27,7 +42,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        if(env('REDIRECT_HTTPS')) {
+        if (env('REDIRECT_HTTPS')) {
             $this->app['request']->server->set('HTTPS', true);
         }
     }
