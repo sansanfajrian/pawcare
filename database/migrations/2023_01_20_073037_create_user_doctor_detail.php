@@ -16,6 +16,7 @@ class CreateUserDoctorDetail extends Migration
         Schema::create('user_doctor_details', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned();
+            $table->string('vet_name')->default('Petcare');
             $table->string('description');
             $table->string('price');
             $table->boolean('is_approved')->nullable();
