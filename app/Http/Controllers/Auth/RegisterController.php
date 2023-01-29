@@ -80,6 +80,7 @@ class RegisterController extends Controller
         if($user->save()){
             UserDoctorDetail::insertGetId([
                 'user_id' => $user->id,
+                'vet_name' => $data['vet_name'],
                 'description' => $data['description'],
                 'price' => $data['price'],
                 'created_at' => date('Y-m-d H:i:s'),

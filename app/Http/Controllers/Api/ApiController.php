@@ -90,7 +90,7 @@ class ApiController extends Controller
     public function editUser(Request $request, $id)
     {
         $token = $this::getCurrentToken($request);
-        $user = User::where('id', $token->user_id)->first();
+        $user = User::where('id', $id)->first();
         if(empty($user)) {
             return response()->json([
                 'status' => 'FAIL',
@@ -110,6 +110,7 @@ class ApiController extends Controller
         try{
             $slug = str_slug($request->name);
             $image = $request->file('image');
+            $imagename = "";
             if (isset($image))
             {
                 $currentDate = Carbon::now()->toDateString();
@@ -126,6 +127,7 @@ class ApiController extends Controller
             }
 
             $banner = $request->file('banner');
+            $bannername = "";
             if (isset($banner)) 
             {
                 $currentDate = Carbon::now()->toDateString();
@@ -141,16 +143,30 @@ class ApiController extends Controller
                 $bannername =  "default.png";
             }
             $user = User::find($id);
-            $user->update([
-                'name' => $request->name,
-                'email' => $request->email,
-                'address' => $request->address,
-                'phone' => $request->phone,
-                'image' => $imagename,
-                'banner' => $bannername
-            ]);
-            DB::commit();
-            $isSuccess = true;
+            $user->name =  $request->name;
+            $user->email = $request->email;
+            $user->address = $request->address;
+            $user->phone = $request->phone;
+            $user->image = $imagename;
+            $user->banner = $bannername;
+
+            if($user->save()){
+                $isSuccess = true;
+            }
+            $fetchUserDetail = User::where('id','=',$user->id)->get();
+            $userDetail = [];
+            foreach($fetchUserDetail as $users) {
+                $userDetail[] = [
+                    'id' => $users->id,
+                    'name' => $users->name,
+                    'gender' => $users->gender,
+                    'email' => $users->email,
+                    'address' => $users->address,
+                    'phone' => $users->phone,
+                    'image' => asset('uploads/profile/'.$users->image),
+                    'banner' => asset('uploads/baner/'.$users->banner),
+                ];
+            }
         } 
         catch(Exception $e){
             DB::rollback();
@@ -161,7 +177,7 @@ class ApiController extends Controller
             'status' => $isSuccess ? 'OK' : 'FAIL',
             'message' => $isSuccess ? 'Berhasil Mengedit User!' : 'Gagal Mengedit User!',
             'result' => [
-                'users' => $user
+                'users' => $userDetail
             ]
         ]);
     }
@@ -206,16 +222,23 @@ class ApiController extends Controller
                 ->orWhere('users.address', 'like', "%$search%")
                 ->orWhere('user_doctor_details.description', 'like', "%$search%");
         }
-        $fetchDoctorList = $fetchDoctorList->get();
+
+        if ($request->has('items')) {
+            $items = $request->items;
+            $fetchDoctorList = $fetchDoctorList->paginate($items);
+        } else{
+            $fetchDoctorList = $fetchDoctorList->paginate(7);
+        }
+        
         $doctorList = [];
         foreach($fetchDoctorList as $doctor) {
             $doctorList[] = [
                 'id' => $doctor->user->id,
                 'user_doctor_detail_id' => $doctor->id,
                 'name' => $doctor->user->name,
-                'address' => $doctor->user->address,
+                'vet_name' => $doctor->vet_name,
+                'image' => asset('uploads/profile/'.$doctor->user->image),
                 'price' => $doctor->price,
-                'description' => $doctor->description,
                 'avg_ratings' => $doctor->ratings,
                 'consultation_count' => $doctor->consultation_count
             ];
@@ -239,9 +262,26 @@ class ApiController extends Controller
         ])
             ->leftJoin('users', 'users.id', 'user_doctor_details.user_id')
             ->orderBy('users.name', 'ASC')
-            ->where('user_doctor_details.user_id', '=', $id)
-            ->get();
+            ->where('user_doctor_details.user_id', '=', $id);
+        
+        $reviewsWithConsultation = DB::table('consultations as c')
+        ->select(
+            DB::raw('AVG(r.star) as avg_star'), 
+            DB::raw('COUNT(r.id) AS consultation_count'),
+            'c.user_doctor_detail_id as doctor_id')
+        ->groupBy('c.user_doctor_detail_id')
+        ->join('reviews as r', 'r.consultation_id', 'c.id');
+        $fetchDoctorList->leftJoinSub($reviewsWithConsultation, 'rev_sub', 'rev_sub.doctor_id', 'user_doctor_details.id')
+        ->addSelect(
+            DB::raw(
+                "CASE WHEN rev_sub.avg_star is null THEN '-' ".
+                "ELSE rev_sub.avg_star ".
+                "END as ratings"
+            ),
+            'consultation_count'
+        );
 
+        $fetchDoctorList = $fetchDoctorList->get();
         $doctorList = [];
         foreach($fetchDoctorList as $doctor) {
             $doctorList[] = [
@@ -249,10 +289,13 @@ class ApiController extends Controller
                 'user_doctor_detail_id' => $doctor->id,
                 'name' => $doctor->user->name,
                 'address' => $doctor->user->address,
+                'vet_name' => $doctor->vet_name,
                 'image'=> asset('uploads/profile/'.$doctor->user->image),
                 'banner'=> asset('uploads/banner/'.$doctor->user->banner),
                 'price' => $doctor->price,
-                'description' => $doctor->description
+                'description' => $doctor->description,
+                'avg_ratings' => $doctor->ratings,
+                'consultation_count' => $doctor->consultation_count
             ];
         }
 
@@ -366,7 +409,13 @@ class ApiController extends Controller
                     "(d_sub.doctor_name like '%$search%' OR consultations.status like '%$search%')"
                 );
         }
-        $fetchConsultationList = $fetchConsultationList->get();
+        if ($request->has('items')) {
+            $items = $request->items;
+            $fetchConsultationList = $fetchConsultationList->paginate(items);
+        } else{
+            $fetchConsultationList = $fetchConsultationList->paginate(7);
+        }
+        
         $consultationList = [];
         foreach($fetchConsultationList as $consultation) {
             $consultationList[] = [
