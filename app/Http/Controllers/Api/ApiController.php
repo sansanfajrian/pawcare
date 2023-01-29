@@ -193,7 +193,8 @@ class ApiController extends Controller
             'user_doctor_details.*',
             'users.name AS name'
         ])
-            ->leftJoin('users', 'users.id', 'user_doctor_details.user_id');
+            ->leftJoin('users', 'users.id', 'user_doctor_details.user_id')
+            ->where('user_doctor_details.is_approved', '=', 1);
         # order by average review ratings
         $reviewsWithConsultation = DB::table('consultations as c')
         ->select(
