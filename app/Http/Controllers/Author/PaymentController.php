@@ -22,7 +22,11 @@ class PaymentController extends Controller
      */
     public function index()
     {
-        $payments = Payment::with(['consultation.user', 'consultation.userDoctorDetail'])->get();
+        $user = Auth::user();
+
+        $doctor_id = $user->userDoctorDetails->id;
+        $payments = Payment::all()
+        ->where('consultation.user_doctor_detail_id', $doctor_id);
         return view('author.payment.index',compact('payments'));
     }
 

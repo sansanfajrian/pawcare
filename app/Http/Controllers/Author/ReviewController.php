@@ -16,17 +16,7 @@ class ReviewController extends Controller
 
         $doctor_id = $user->userDoctorDetails->id;
         #list of reviews
-        $reviews = Review::with(['consultation.user', 'consultation.userDoctorDetail'])
-            ->where('consultation.user_doctor_detail_id', $doctor_id)
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'id' => $item->id,
-                    'name' => $item->consultation->user->name,
-                    'star' => $item->star,
-                    'review' => $item->review
-                ];
-            });
+        $reviews = Review::all()->where('consultation.user_doctor_detail_id', $doctor_id);
         return view('author.review', [
             'data' => $reviews
         ]);

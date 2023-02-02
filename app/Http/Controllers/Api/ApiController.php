@@ -371,57 +371,65 @@ class ApiController extends Controller
         }
 
         $isSuccess = false;
-
-        DB::beginTransaction();
-        try {
-            $message = "";
-            if(!$request->message){
-                $message = "-";
-            }else{
-                $message = $request->message;
-            }
-            $doctor = UserDoctorDetail::where('id', $request->user_doctor_detail_id)->first();
-
-            $consultationId = Consultation::insertGetId([
-                'user_id' => $user->id,
-                'user_doctor_detail_id' => $doctor->id,
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
+        $consult_status = Consultation::where('user_id', '=', $user->id)->first();
+        if($consult_status->status == 'Menunggu Pembayaran' || $consult_status->status == 'Menunggu Persetujuan' || $consult_status->status == 'Ditolak'){
+            return response()->json([
+                'status' => 'FAIL',
+                'message' => 'Maaf anda masih memiliki konsultasi dengan dokter, silahkan selesaikan konsultasi anda terlebih dahulu'
             ]);
+        }
+        else{
+            DB::beginTransaction();
+            try {
+                $message = "";
+                if(!$request->message){
+                    $message = "-";
+                }else{
+                    $message = $request->message;
+                }
+                $doctor = UserDoctorDetail::where('id', $request->user_doctor_detail_id)->first();
 
-            $fetchConsultationDetail = Consultation::where('id','=',$consultationId)->get();
-            $consultationDetail = [];
-            foreach($fetchConsultationDetail as $consultation) {
-                $consultationDetail[] = [
-                    'id' => $consultation->id,
-                    'status' => $consultation->status,
-                    'consultation_date' => $consultation->created_at->format('Y-m-d h:i:s'),
-                    'patient' => $consultation->user->name,
-                    'doctor' => $consultation->userDoctorDetail->user->name,
-                    'address' => $consultation->userDoctorDetail->user->address,
-                    'vet_name' => $consultation->userDoctorDetail->vet_name,
-                    'price' => $consultation->userDoctorDetail->price,
-                    'discount' => $doctor->discount,
-                    'discounted_price' => ($doctor->price - (($doctor->price * $doctor->discount)/100)),
-                    'description' => $consultation->userDoctorDetail->description,
-                    'max_payment_time' => Carbon::parse($consultation->created_at)->addHours(24)->format('Y-m-d h:i:s'),
-                ];
+                $consultationId = Consultation::insertGetId([
+                    'user_id' => $user->id,
+                    'user_doctor_detail_id' => $doctor->id,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+
+                $fetchConsultationDetail = Consultation::where('id','=',$consultationId)->get();
+                $consultationDetail = [];
+                foreach($fetchConsultationDetail as $consultation) {
+                    $consultationDetail[] = [
+                        'id' => $consultation->id,
+                        'status' => $consultation->status,
+                        'consultation_date' => $consultation->created_at->format('Y-m-d h:i:s'),
+                        'patient' => $consultation->user->name,
+                        'doctor' => $consultation->userDoctorDetail->user->name,
+                        'address' => $consultation->userDoctorDetail->user->address,
+                        'vet_name' => $consultation->userDoctorDetail->vet_name,
+                        'price' => $consultation->userDoctorDetail->price,
+                        'discount' => $doctor->discount,
+                        'discounted_price' => ($doctor->price - (($doctor->price * $doctor->discount)/100)),
+                        'description' => $consultation->userDoctorDetail->description,
+                        'max_payment_time' => Carbon::parse($consultation->created_at)->addHours(24)->format('Y-m-d h:i:s'),
+                    ];
+                }
+
+                DB::commit();
+                $isSuccess = true;
+            } catch (Exception $e) {
+                DB::rollback();
+                $isSuccess = false;
             }
 
-            DB::commit();
-            $isSuccess = true;
-        } catch (Exception $e) {
-            DB::rollback();
-            $isSuccess = false;
+            return response()->json([
+                'status' => $isSuccess ? 'OK' : 'FAIL',
+                'message' => $isSuccess ? 'Berhasil konsultasi dengan dokter!' : 'Gagal untuk konsultasi dengan dokter!',
+                'results' => [
+                    'consultation' => $consultationDetail
+                ]
+            ]);
         }
-
-        return response()->json([
-            'status' => $isSuccess ? 'OK' : 'FAIL',
-            'message' => $isSuccess ? 'Berhasil konsultasi dengan dokter!' : 'Gagal untuk konsultasi dengan dokter!',
-            'result' => [
-                'consultation' => $consultationDetail
-            ]
-        ]);
     }
 
     public function consultationDetail(Request $request, $id)
