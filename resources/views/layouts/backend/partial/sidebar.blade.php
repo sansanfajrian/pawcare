@@ -115,16 +115,16 @@
                         <span>Consultations</span>
                     </a>
                 </li>
-                <li class="{{ Request::is('author/reviews') ? 'active' : '' }}">
-                    <a href="{{ route('author.reviews.index') }}">
-                        <i class="material-icons">star</i>
-                        <span>Reviews</span>
-                    </a>
-                </li>
                 <li class="{{ Request::is('author/payment') ? 'active' : '' }}">
                     <a href="{{ route('author.payment.index') }}">
                         <i class="material-icons">payments</i>
                         <span>Payment</span>
+                    </a>
+                </li>
+                <li class="{{ Request::is('author/reviews') ? 'active' : '' }}">
+                    <a href="{{ route('author.reviews.index') }}">
+                        <i class="material-icons">star</i>
+                        <span>Reviews</span>
                     </a>
                 </li>
                 <li class="header">System</li>
