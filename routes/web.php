@@ -45,6 +45,8 @@ Route::group(['as'=>'admin.','prefix'=>'admin','namespace'=>'Admin','middleware'
 
 Route::group(['as'=>'author.','prefix'=>'author','namespace'=>'Author','middleware'=>['auth','author']], function (){
     Route::get('dashboard','DashboardController@index')->name('dashboard');
+    Route::get('dashboard/consultation/{id}', 'DashboardController@showConsultation')->name('dashboard-show-consultation');
+    Route::get('dashboard/review/{id}', 'DashboardController@showReview')->name('dashboard-show-review');
 
     Route::get('settings','SettingsController@index')->name('settings');
     Route::put('profile-update','SettingsController@updateProfile')->name('profile.update');

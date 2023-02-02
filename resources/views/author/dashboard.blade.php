@@ -37,6 +37,11 @@
                             {{$item['status'] }}
                         </span>
                     </td>
+                    <td class="text-center">
+                        <a href="{{ route('author.dashboard-show-consultation',$item['id']) }}" class="btn btn-info waves-effect">
+                            <i class="material-icons">details</i>
+                        </a>
+                    </td>
                 </tr>
                 @endforeach
             </tbody>
@@ -64,6 +69,11 @@
                     <td>{{$item['name']}}</td>
                     <td>{{$item['star']}}</td>
                     <td>{{$item['review']}}</td>
+                    <td class="text-center">
+                        <a href="{{ route('author.dashboard-show-review',$item['id']) }}" class="btn btn-info waves-effect">
+                            <i class="material-icons">details</i>
+                        </a>
+                    </td>
                 </tr>
                 @endforeach
             </tbody>

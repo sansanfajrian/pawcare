@@ -25,6 +25,7 @@ class DashboardController extends Controller
             ->map(function ($item) {
                 $item = $item->toArray();
                 return [
+                    'id' => $item['id'],
                     'patient_name' => $item['user']['name'],
                     'gender' => $item['user']['gender'],
                     'doctor_name' => $item['user_doctor_detail']['user']['name'],
@@ -35,8 +36,9 @@ class DashboardController extends Controller
         #list of reviews
         $reviews = Review::with(['consultation.user', 'consultation.userDoctorDetail'])
             ->get()
-            ->map(function ($item){
+            ->map(function ($item) {
                 return [
+                    'id' => $item->id,
                     'name' => $item->consultation->user->name,
                     'star' => $item->star,
                     'review' => $item->review
@@ -45,6 +47,25 @@ class DashboardController extends Controller
         return view('author.dashboard', [
             'consultations' => $consultations,
             'reviews' => $reviews
+        ]);
+    }
+
+    public function showConsultation($id)
+    {
+        $data = Consultation::with(['user', 'userDoctorDetail.user'])
+            ->find($id);
+
+        return view('author.show.consultation', [
+            'data' => $data->toArray()
+        ]);
+    }
+
+    public function showReview($id)
+    {
+        $data = Review::with(['consultation.user', 'consultation.userDoctorDetail.user'])
+            ->find($id);
+        return view('author.show.review', [
+            'data' => $data->toArray()
         ]);
     }
 }
