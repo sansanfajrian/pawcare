@@ -54,7 +54,7 @@
                         </div>
                     </div>
 
-                    <a href="{{ route('admin.consultations.index') }}" class="btn btn-danger">Back</a>
+                    <a href="{{ route('author.consultations.index') }}" class="btn btn-danger">Back</a>
                 </div>
             </div>
         </div>
