@@ -106,7 +106,8 @@ header .main-menu > li{ float: left; }
 
 header .main-menu > li > a{ height: 60px; line-height: 60px; padding: 0 25px; border-right: none !important; }
 
-header .main-menu > li > a:hover{  background: #eee; }
+header .main-menu > li > a:hover{  background: #eee; border-radius: 80px !important;     color: #FF9494 !important;
+	font-weight: 500; }
 
 header .main-menu > li:first-child > a{ border-left: 1px solid #eee; }
 
@@ -203,7 +204,7 @@ footer .footer-section ul > li{ margin-right: 10px; margin-top: 10px; }
 footer .copyright{ margin: 10px 0 20px; }
 
 footer .icons > li > a{ height: 40px; width: 40px; border-radius: 40px; line-height: 40px; text-align: center; 
-	transition: all .3s; box-shadow: 0px 0px 2px rgba(0,0,0,1); background: #498BF9; color: #fff; }
+	transition: all .3s; box-shadow: 0px 0px 2px rgba(0,0,0,1); background: #FFD1D1; color: #000; }
 
 footer .icons > li > a:hover{ transform: translateY(-2px); box-shadow: 5px 10px 20px rgba(0,0,0,.3); }
 

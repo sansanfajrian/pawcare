@@ -9,9 +9,7 @@
 @endpush
 
 @section('content')
-    <div class="slider display-table center-text">
-        <h1 class="title display-table-cell"><b>REGISTER</b></h1>
-    </div><!-- slider -->
+
 
     <section class="blog-area section">
         <div class="container">
@@ -150,7 +148,7 @@
                                 <label for="Price" class="col-md-4 col-form-label text-md-right">{{ __('Price') }}</label>
 
                                 <div class="col-md-6">
-                                    <input id="price" type="text" class="form-control{{ $errors->has('price') ? ' is-invalid' : '' }}" name="price" value="{{ old('price') }}">
+                                    <input id="price" type="number" class="form-control{{ $errors->has('price') ? ' is-invalid' : '' }}" name="price" value="{{ old('price') }}">
 
                                     @if ($errors->has('price'))
                                         <span class="invalid-feedback">

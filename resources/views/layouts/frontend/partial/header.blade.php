@@ -5,7 +5,7 @@
         <ul class="main-menu visible-on-click" id="main-menu">
             @guest
                 <li><a href="{{ route('login') }}">Login</a></li>
-                <li><a href="{{ route('register') }}">Register</a></li>
+                <li><a href="{{ route('register') }}">Register Dokter</a></li>
             @else
                 @if(Auth::user()->role->id == 1)
                     <li><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
