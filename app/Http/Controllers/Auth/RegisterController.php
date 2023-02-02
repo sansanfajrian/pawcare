@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Auth;
 use App\AccountApproval;
 use App\User;
 use App\UserDoctorDetail;
+use Carbon\Carbon;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Brian2694\Toastr\Facades\Toastr;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
 
 class RegisterController extends Controller
 {
@@ -58,6 +61,8 @@ class RegisterController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
             'phone' => 'required|min:8|max:14',
+            'image' => 'required|mimes:jpeg,bmp,png,jpg',
+            'banner' => 'required|mimes:jpeg,bmp,png,jpg'
         ]);
     }
 
@@ -69,14 +74,57 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-
+        $request = request();
         $user = new User();
+        $image = $request->file('image');
+        $imageName = "";
+        $slug = str_slug($data['name']);
+        if (isset($image))
+        {
+            $currentDate = Carbon::now()->toDateString();
+            $imageName = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
+            if (!Storage::disk('public')->exists('uploads/profile'))
+            {
+                Storage::disk('public')->makeDirectory('uploads/profile');
+            }
+//            Delete old image form profile folder
+            if (Storage::disk('public')->exists('uploads/profile/'.$user->image))
+            {
+                Storage::disk('public')->delete('uploads/profile/'.$user->image);
+            }
+            $image->move('uploads/profile',$imageName);
+        } else {
+            $imageName = $user->image;
+        }
+
+        $banner = $request->file('banner');
+        $bannerName = "";
+        if (isset($banner))
+        {
+            $currentDate = Carbon::now()->toDateString();
+            $bannerName = $slug.'-'.$currentDate.'-'.uniqid().'.'.$banner->getClientOriginalExtension();
+            if (!Storage::disk('public')->exists('uploads/banner'))
+            {
+                Storage::disk('public')->makeDirectory('uploads/banner');
+            }
+//            Delete old image form profile folder
+            if (Storage::disk('public')->exists('uploads/banner/'.$user->banner))
+            {
+                Storage::disk('public')->delete('uploads/banner/'.$user->banner);
+            }
+            $banner->move('uploads/banner',$bannerName);
+        } else {
+            $bannerName = $user->image;
+        }
+
         $user->name = $data['name'];
         $user->email = $data['email'];
         $user->password = Hash::make($data['password']);
         $user->address = $data['address'];
         $user->gender = $data['gender'];
         $user->phone = $data['phone'];
+        $user->image = $imageName;
+        $user->banner = $bannerName;
         $user->created_at = date('Y-m-d H:i:s');
         $user->updated_at = date('Y-m-d H:i:s');
 
@@ -86,6 +134,7 @@ class RegisterController extends Controller
                 'vet_name' => $data['vet_name'],
                 'description' => $data['description'],
                 'price' => $data['price'],
+                'discount' => $data['discount'],
                 'is_approved' => false,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
