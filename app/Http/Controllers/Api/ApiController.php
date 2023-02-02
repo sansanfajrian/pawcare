@@ -551,19 +551,6 @@ class ApiController extends Controller
                 //            make unique name for image
                 $currentDate = Carbon::now()->toDateString();
                 $imagename = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
-                //            check banner dir is exists
-                /*if (!Storage::disk('public')->exists('banner'))
-                {
-                    Storage::disk('public')->makeDirectory('banner');
-                }
-    //            delete old image
-                if (Storage::disk('public')->exists('banner/'.$banner->image))
-                {
-                    Storage::disk('public')->delete('banner/'.$banner->image);
-                }
-    //            resize image for banner and upload
-                $bannerimage = Image::make($image)->resize(1600,479)->stream();
-                Storage::disk('public')->put('banner/'.$imagename,$bannerimage);*/
 
                 if (!file_exists('uploads/payments')) 
                 {
