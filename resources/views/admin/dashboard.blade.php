@@ -56,7 +56,7 @@
 
 <!-- mt-5 doesn't work, so sorry... so i margin the container manually to create space -->
 <div class="container-fluid" style="margin-top: 10px;">
-<h1>List Doctors</h1>
+    <h1>List Doctors</h1>
     <table class="table">
         <thead>
             <tr>
@@ -81,6 +81,11 @@
                         {{$item['status'] == 0 ? 'Not Approved' : 'Approved'}}
                     </span>
                 </td>
+                <td class="text-center">
+                    <a href="{{ route('admin.dashboard-show-doctor',$item['id']) }}" class="btn btn-info waves-effect">
+                        <i class="material-icons">details</i>
+                    </a>
+                </td>
             </tr>
             @endforeach
         </tbody>
@@ -89,7 +94,7 @@
 
 <!-- mt-5 doesn't work, so sorry... so i margin the container manually to create space -->
 <div class="container-fluid" style="margin-top: 10px;">
-<h1>List Users</h1>
+    <h1>List Users</h1>
     <table class="table">
         <thead>
             <tr>
@@ -108,6 +113,11 @@
                 <td>{{$item['price']}}</td>
                 <td>{{$item['phone']}}</td>
                 <td>{{$item['created_at']}}</td>
+                <td class="text-center">
+                    <a href="{{ route('admin.dashboard-show-user',$item['id']) }}" class="btn btn-info waves-effect">
+                        <i class="material-icons">details</i>
+                    </a>
+                </td>
             </tr>
             @endforeach
         </tbody>
@@ -115,7 +125,7 @@
 </div>
 <!-- mt-5 doesn't work, so sorry... so i margin the container manually to create space -->
 <div class="container-fluid" style="margin-top: 10px;">
-<h1>List Consultations</h1>
+    <h1>List Consultations</h1>
     <table class="table">
         <thead>
             <tr>
@@ -137,6 +147,11 @@
                     <span class="badge badge-pill badge-primary">
                         {{$item['status'] }}
                     </span>
+                </td>
+                <td class="text-center">
+                    <a href="{{ route('admin.dashboard-show-consultation',$item['id']) }}" class="btn btn-info waves-effect">
+                        <i class="material-icons">details</i>
+                    </a>
                 </td>
             </tr>
             @endforeach

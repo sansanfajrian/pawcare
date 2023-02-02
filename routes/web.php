@@ -22,6 +22,9 @@ Auth::routes();
 
 Route::group(['as'=>'admin.','prefix'=>'admin','namespace'=>'Admin','middleware'=>['auth','admin']], function (){
     Route::get('dashboard','DashboardController@index')->name('dashboard');
+    Route::get('dashboard/doctor/{id}', 'DashboardController@showDoctor')->name('dashboard-show-doctor');
+    Route::get('dashboard/user/{id}', 'DashboardController@showUser') ->name('dashboard-show-user');
+    Route::get('dashboard/consultation/{id}', 'DashboardController@showConsultation')->name('dashboard-show-consultation');
 
     Route::group([
         'prefix' => 'approvals',
