@@ -54,7 +54,7 @@
                         </div>
                     </div>
 
-                    <a href="{{ route('admin.dashboard') }}" class="btn btn-danger">Back</a>
+                    <a href="{{ route('admin.users.index') }}" class="btn btn-danger">Back</a>
                 </div>
             </div>
         </div>

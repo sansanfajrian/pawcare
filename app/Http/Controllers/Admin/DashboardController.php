@@ -30,32 +30,7 @@ class DashboardController extends Controller
                 ];
             });
 
-        #list of users
-        $users = User::where('role_id', 3)->get()
-            ->map(function ($item) {
-                return [
-                    'id' => $item->id,
-                    'name' => $item->name,
-                    'price' => $item->email,
-                    'phone' => $item->phone,
-                    'created_at' => $item->created_at,
-                ];
-            });
-
-        #list of consultations
-        $consultations = Consultation::with(['userDoctorDetail.user', 'user'])->get()
-            ->map(function ($item) {
-                $item = $item->toArray();
-                return [
-                    'id' => $item['id'],
-                    'patient_name' => $item['user']['name'],
-                    'gender' => $item['user']['gender'],
-                    'doctor_name' => $item['user_doctor_detail']['user']['name'],
-                    'status' => $item['status'],
-                ];
-            });
-
-        return view('admin.dashboard', compact('author_count', 'new_authors_today', 'doctors', 'users', 'consultations'));
+        return view('admin.dashboard', compact('author_count', 'new_authors_today'));
     }
 
     public function showDoctor($id)

@@ -50,6 +50,24 @@
                         <span>Doctor Approvals</span>
                     </a>
                 </li>
+                <li class="{{ Request::is('admin/users') ? 'active' : '' }}">
+                    <a href="{{ route('admin.users.index') }}">
+                        <i class="material-icons">person</i>
+                        <span>Users</span>
+                    </a>
+                </li>
+                <li class="{{ Request::is('admin/doctors') ? 'active' : '' }}">
+                    <a href="{{ route('admin.doctors.index') }}">
+                        <i class="material-icons">medication</i>
+                        <span>Doctors</span>
+                    </a>
+                </li>
+                <li class="{{ Request::is('admin/consultations') ? 'active' : '' }}">
+                    <a href="{{ route('admin.consultations.index') }}">
+                        <i class="material-icons">list</i>
+                        <span>Consultations</span>
+                    </a>
+                </li>
                 <li class="{{ Request::is('admin/banner') ? 'active' : '' }}">
                     <a href="{{ route('admin.banner.index') }}">
                         <i class="material-icons">image</i>
@@ -89,6 +107,18 @@
                     <a href="{{ route('author.dashboard') }}">
                         <i class="material-icons">dashboard</i>
                         <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="{{ Request::is('author/consultations') ? 'active' : '' }}">
+                    <a href="{{ route('author.consultations.index') }}">
+                        <i class="material-icons">list</i>
+                        <span>Consultations</span>
+                    </a>
+                </li>
+                <li class="{{ Request::is('author/reviews') ? 'active' : '' }}">
+                    <a href="{{ route('author.reviews.index') }}">
+                        <i class="material-icons">star</i>
+                        <span>Reviews</span>
                     </a>
                 </li>
                 <li class="{{ Request::is('author/payment') ? 'active' : '' }}">
