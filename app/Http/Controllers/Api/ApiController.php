@@ -16,6 +16,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Password;
 
 class ApiController extends Controller
 {
@@ -46,6 +47,27 @@ class ApiController extends Controller
             return response()->json([
                 'status' => 'FAIL',
                 'message' => 'Email dan Password tidak cocok!'
+            ]);
+        }
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+ 
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        if($status == Password::RESET_LINK_SENT) {
+            return response()->json([
+                'status' => 'OK',
+                'message' => 'Link forgot password sudah dikirim ke email anda!'
+            ]);
+        } else{
+            return response()->json([
+                'status' => 'FAIL',
+                'message' => 'Link forgot password anda gagal dikirim!'
             ]);
         }
     }
@@ -240,6 +262,8 @@ class ApiController extends Controller
                 'vet_name' => $doctor->vet_name,
                 'image' => asset('uploads/profile/'.$doctor->user->image),
                 'price' => $doctor->price,
+                'discount' => $doctor->discount,
+                'discounted_price' => ($doctor->price - (($doctor->price * $doctor->discount)/100)),
                 'avg_ratings' => $doctor->ratings,
                 'consultation_count' => $doctor->consultation_count ?? 0
             ];
@@ -294,6 +318,8 @@ class ApiController extends Controller
                 'image'=> asset('uploads/profile/'.$doctor->user->image),
                 'banner'=> asset('uploads/banner/'.$doctor->user->banner),
                 'price' => $doctor->price,
+                'discount' => $doctor->discount,
+                'discounted_price' => ($doctor->price - (($doctor->price * $doctor->discount)/100)),
                 'description' => $doctor->description,
                 'avg_ratings' => $doctor->ratings,
                 'consultation_count' => $doctor->consultation_count ?? 0
@@ -363,6 +389,25 @@ class ApiController extends Controller
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
 
+            $fetchConsultationDetail = Consultation::where('id','=',$consultationId)->get();
+            $consultationDetail = [];
+            foreach($fetchConsultationDetail as $consultation) {
+                $consultationDetail[] = [
+                    'id' => $consultation->id,
+                    'status' => $consultation->status,
+                    'consultation_date' => $consultation->created_at->format('Y-m-d h:i:s'),
+                    'patient' => $consultation->user->name,
+                    'doctor' => $consultation->userDoctorDetail->user->name,
+                    'address' => $consultation->userDoctorDetail->user->address,
+                    'vet_name' => $consultation->userDoctorDetail->vet_name,
+                    'price' => $consultation->userDoctorDetail->price,
+                    'discount' => $doctor->discount,
+                    'discounted_price' => ($doctor->price - (($doctor->price * $doctor->discount)/100)),
+                    'description' => $consultation->userDoctorDetail->description,
+                    'max_payment_time' => Carbon::parse($consultation->created_at)->addHours(24)->format('Y-m-d h:i:s'),
+                ];
+            }
+
             DB::commit();
             $isSuccess = true;
         } catch (Exception $e) {
@@ -372,7 +417,44 @@ class ApiController extends Controller
 
         return response()->json([
             'status' => $isSuccess ? 'OK' : 'FAIL',
-            'message' => $isSuccess ? 'Berhasil konsultasi dengan dokter!' : 'Gagal untuk konsultasi dengan dokter!'
+            'message' => $isSuccess ? 'Berhasil konsultasi dengan dokter!' : 'Gagal untuk konsultasi dengan dokter!',
+            'result' => [
+                'consultation' => $consultationDetail
+            ]
+        ]);
+    }
+
+    public function consultationDetail(Request $request, $id)
+    {
+        $token = $this::getCurrentToken($request);
+        $fetchConsultationList = Consultation::select([
+            'consultations.*',
+        ])
+            ->where('consultations.id', '=', $id)
+            ->get();
+        $consultationDetail = [];
+            foreach($fetchConsultationList as $consultation) {
+                $consultationDetail[] = [
+                    'id' => $consultation->id,
+                    'status' => $consultation->status,
+                    'consultation_date' => $consultation->created_at->format('Y-m-d h:i:s'),
+                    'patient' => $consultation->user->name,
+                    'doctor' => $consultation->userDoctorDetail->user->name,
+                    'address' => $consultation->userDoctorDetail->user->address,
+                    'vet_name' => $consultation->userDoctorDetail->vet_name,
+                    'price' => $consultation->userDoctorDetail->price,
+                    'discount' => $doctor->discount,
+                    'discounted_price' => ($doctor->price - (($doctor->price * $doctor->discount)/100)),
+                    'description' => $consultation->userDoctorDetail->description,
+                    'max_payment_time' => Carbon::parse($consultation->created_at)->addHours(24)->format('Y-m-d h:i:s'),
+                ];
+            }
+
+        return response()->json([
+            'status' => 'OK',
+            'results' => [
+                'consultation' => $consultationDetail
+            ]
         ]);
     }
 

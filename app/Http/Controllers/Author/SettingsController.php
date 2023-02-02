@@ -77,7 +77,9 @@ class SettingsController extends Controller
         $user->phone = $request->phone;
         if($user->save()){
             $doctor = UserDoctorDetail::where('user_id', $user->id)->first();
+            $doctor->vet_name = $request->vet_name;
             $doctor->price = $request->price;
+            $doctor->discount = $request->discount;
             $doctor->description = $request->description;
             $doctor->save();
         }

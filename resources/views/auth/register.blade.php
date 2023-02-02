@@ -18,7 +18,7 @@
                 <div class="col-lg-2 col-md-0"></div>
                 <div class="col-lg-8 col-md-12">
                     <div class="post-wrapper">
-                        <form method="POST" action="{{ route('register') }}">
+                        <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
                             @csrf
 
                             <div class="form-group row">
@@ -117,6 +117,22 @@
                             </div>
 
                             <div class="form-group row">
+                                <label for="unafe" class="col-md-4 col-form-label text-md-right">{{ __('Profile Image') }}</label>
+
+                                <div class="col-md-6">
+                                    <input type="file" name="image">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="unafe" class="col-md-4 col-form-label text-md-right">{{ __('Banner Image') }}</label>
+
+                                <div class="col-md-6">
+                                    <input type="file" name="banner">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
                                 <label for="vet_name" class="col-md-4 col-form-label text-md-right">{{ __('Vet Name/Petcare Name') }}</label>
 
                                 <div class="col-md-6">
@@ -153,6 +169,20 @@
                                     @if ($errors->has('price'))
                                         <span class="invalid-feedback">
                                         <strong>{{ $errors->first('price') }}</strong>
+                                    </span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="Discount" class="col-md-4 col-form-label text-md-right">{{ __('Discount') }}</label>
+
+                                <div class="col-md-6">
+                                    <input id="discount" type="number" class="form-control{{ $errors->has('discount') ? ' is-invalid' : '' }}" name="discount" value="{{ old('discount') }}">
+
+                                    @if ($errors->has('discount'))
+                                        <span class="invalid-feedback">
+                                        <strong>{{ $errors->first('discount') }}</strong>
                                     </span>
                                     @endif
                                 </div>

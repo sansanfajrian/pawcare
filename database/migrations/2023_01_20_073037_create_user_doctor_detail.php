@@ -18,7 +18,8 @@ class CreateUserDoctorDetail extends Migration
             $table->integer('user_id')->unsigned();
             $table->string('vet_name')->default('Petcare');
             $table->string('description');
-            $table->string('price');
+            $table->integer('price');
+            $table->integer('discount')->nullable();
             $table->boolean('is_approved')->nullable();
             $table->foreign('user_id')
                 ->references('id')->on('users')
