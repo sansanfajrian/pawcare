@@ -455,7 +455,7 @@ class ApiController extends Controller
             'status' => 'OK',
             'results' => [
                 'consultation' => $consultationDetail
-            ]co
+            ]
         ]);
     }
 
