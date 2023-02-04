@@ -71,6 +71,8 @@ Route::group(['as' => 'admin.', 'prefix' => 'admin', 'namespace' => 'Admin', 'mi
 
     Route::resource('banner', 'BannerController');
     Route::resource('payment', 'PaymentController');
+    Route::post('payment/status/{id}', 'PaymentController@status')->name('payment.status');
+    Route::post('payment/status_deny/{id}', 'PaymentController@statusDeny')->name('payment.status_deny');
 });
 
 Route::group(['as' => 'author.', 'prefix' => 'author', 'namespace' => 'Author', 'middleware' => ['auth', 'author']], function () {
@@ -83,8 +85,6 @@ Route::group(['as' => 'author.', 'prefix' => 'author', 'namespace' => 'Author', 
     Route::put('password-update', 'SettingsController@updatePassword')->name('password.update');
 
     Route::resource('payment', 'PaymentController');
-    Route::post('payment/status/{id}', 'PaymentController@status')->name('payment.status');
-    Route::post('payment/status_deny/{id}', 'PaymentController@statusDeny')->name('payment.status_deny');
 
     Route::group([
             'prefix' => 'consultations',

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Payment;
+use App\Consultation;
 use Brian2694\Toastr\Facades\Toastr;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -34,5 +35,29 @@ class PaymentController extends Controller
     {
         $payment = Payment::find($id);
         return view('admin.payment.show', compact('payment'));
+    }
+
+    public function status($id){
+        $consultation_id = Payment::find($id)->first()->consultation_id;
+        $consultation = Consultation::find($consultation_id);
+        $consultation->status = "Sesi Konsultasi";
+        if($consultation->save()){
+            Toastr::success('Payment Approved!','Success',["positionClass"=>"toast-top-right"]);
+            return redirect()->back();
+        }else{
+            return redirect()->back()->with('successMsg','Gagal di konfirmasi');
+        }
+    }
+
+    public function statusDeny($id){
+        $consultation_id = Payment::find($id)->first()->consultation_id;
+        $consultation = Consultation::find($consultation_id);
+        $consultation->status = "Pembayaran Ditolak";
+        if($consultation->save()){
+            Toastr::success('Payment Denied!','Success',["positionClass"=>"toast-top-right"]);
+            return redirect()->back();
+        }else{
+            return redirect()->back()->with('successMsg','Gagal di konfirmasi');
+        }
     }
 }

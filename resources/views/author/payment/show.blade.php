@@ -72,33 +72,7 @@
                                 </div>
                             </div>
 
-                            <form id="status-form-{{ $payment->id }}" method="post" action="{{ route('author.payment.status',$payment->id ) }}"
-                                style="display: none;">
-                                @csrf
-                            </form>
-                            @if($payment->consultation->status == "Ditolak" || $payment->consultation->status == "Menunggu Pembayaran" )
-                                <button type="button" class="btn btn-success btn-sm" name="action" value="accept"
-                                    onclick="if(confirm('Are you sure?')){
-                                    event.preventDefault();
-                                    document.getElementById('status-form-{{ $payment->id }}').submit();
-                                    }else {
-                                        event.preventDefault();
-                                    }">Accept</button>
-                                
-                                <form id="status-deny-form-{{ $payment->id }}" method="post" action="{{ route('author.payment.status_deny',$payment->id ) }}"
-                                    style="display: none;">
-                                    @csrf
-                                </form>
-                                <button type="button" class="btn btn-danger btn-sm" name="action" value="deny"
-                                    onclick="if(confirm('Are you sure?')){
-                                    event.preventDefault();
-                                    document.getElementById('status-deny-form-{{ $payment->id }}').submit();
-                                    }else {
-                                        event.preventDefault();
-                                    }">Deny</button>
-                            @else
-                                <a href="{{ route('author.payment.index') }}" class="btn btn-danger">Back</a>
-                            @endif
+                            <a href="{{ route('author.payment.index') }}" class="btn btn-danger">Back</a>
                     </div>
                 </div>
             </div>
