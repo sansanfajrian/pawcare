@@ -503,7 +503,7 @@ class ApiController extends Controller
         $consultationList = [];
         foreach($fetchConsultationList as $consultation) {
             $consultationList[] = [
-                'id' = $consultation->id,
+                'id' => $consultation->id,
                 'doctor' => $consultation->userDoctorDetail->user->name,
                 'price' => $consultation->userDoctorDetail->price,
                 'status'=> $consultation->status,
