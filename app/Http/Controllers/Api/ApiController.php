@@ -455,7 +455,7 @@ class ApiController extends Controller
             'status' => 'OK',
             'results' => [
                 'consultation' => $consultationDetail
-            ]
+            ]co
         ]);
     }
 
@@ -503,6 +503,7 @@ class ApiController extends Controller
         $consultationList = [];
         foreach($fetchConsultationList as $consultation) {
             $consultationList[] = [
+                'id' = $consultation->id,
                 'doctor' => $consultation->userDoctorDetail->user->name,
                 'price' => $consultation->userDoctorDetail->price,
                 'status'=> $consultation->status,
