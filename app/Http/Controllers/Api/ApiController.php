@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Console\Scheduling\Schedule;
 
 class ApiController extends Controller
 {
@@ -537,63 +538,74 @@ class ApiController extends Controller
             ]);
         }
 
+        
+        $consultation_id = $request->consultation_id;
+        $consultation = Consultation::find($consultation_id);
+
         $isSuccess = false;
 
         DB::beginTransaction();
-        try {
-            $message = "";
-            if(!$request->message){
-                $message = "-";
-            }else{
-                $message = $request->message;
-            }
 
-            $this->validate($request,[
-                'image' => 'mimes:jpeg,bmp,png,jpg'
+        if($consultation->status == 'Dibatalkan'){
+            return response()->json([
+                'status' => 'FAIL'
+                'message' => 'Maaf anda terlambat untuk melakukan pembayaran silahkan konsultasi ulang dengan dokter!'
             ]);
-            // get form image
-            $image = $request->file('image');
-            $slug = str_slug($request->sender_name);
-            if (isset($image)) 
-            {
-                //            make unique name for image
-                $currentDate = Carbon::now()->toDateString();
-                $imagename = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
-
-                if (!file_exists('uploads/payments')) 
-                {
-                    mkdir('uploads/payments',0777,true);
+        } else{
+            try {
+                $message = "";
+                if(!$request->message){
+                    $message = "-";
+                }else{
+                    $message = $request->message;
                 }
-                $image->move('uploads/payments',$imagename);
+    
+                $this->validate($request,[
+                    'image' => 'mimes:jpeg,bmp,png,jpg'
+                ]);
+                // get form image
+                $image = $request->file('image');
+                $slug = str_slug($request->sender_name);
+                if (isset($image)) 
+                {
+                    //            make unique name for image
+                    $currentDate = Carbon::now()->toDateString();
+                    $imagename = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
+    
+                    if (!file_exists('uploads/payments')) 
+                    {
+                        mkdir('uploads/payments',0777,true);
+                    }
+                    $image->move('uploads/payments',$imagename);
+    
+                } else {
+                    $imagename = "default.png";
+                }
+    
+                $paymentId = Payment::insertGetId([
+                    'consultation_id' => $request->consultation_id,
+                    'bank_name' => $request->bank_name,
+                    'sender_name' => $request->sender_name,
+                    'image' => $imagename,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+    
+                $consultation->status = "Menunggu Persetujuan";
+                $consultation->save();
 
-            } else {
-                $imagename = "default.png";
+                DB::commit();
+                $isSuccess = true;
+            } catch (Exception $e) {
+                DB::rollback();
+                $isSuccess = false;
             }
-
-            $paymentId = Payment::insertGetId([
-                'consultation_id' => $request->consultation_id,
-                'bank_name' => $request->bank_name,
-                'sender_name' => $request->sender_name,
-                'image' => $imagename,
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
+    
+            return response()->json([
+                'status' => $isSuccess ? 'OK' : 'FAIL',
+                'message' => $isSuccess ? 'Berhasil mengirimkan bukti pembayaran!' : 'Gagal mengirimkan bukti pembayaran!'
             ]);
-
-            $consultation_id = $request->consultation_id;
-            $consultation = Consultation::find($consultation_id);
-            $consultation->status = "Menunggu Persetujuan";
-            $consultation->save();
-            DB::commit();
-            $isSuccess = true;
-        } catch (Exception $e) {
-            DB::rollback();
-            $isSuccess = false;
         }
-
-        return response()->json([
-            'status' => $isSuccess ? 'OK' : 'FAIL',
-            'message' => $isSuccess ? 'Berhasil mengirimkan bukti pembayaran!' : 'Gagal mengirimkan bukti pembayaran!'
-        ]);
     }
 
     public function review(Request $request)

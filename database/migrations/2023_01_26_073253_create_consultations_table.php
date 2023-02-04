@@ -21,7 +21,7 @@ class CreateConsultationsTable extends Migration
             $table->integer('user_doctor_detail_id')->unsigned();
             $table->foreign('user_doctor_detail_id')
                 ->references('id')->on('user_doctor_details');
-            $table->enum('status', ['Menunggu Pembayaran', 'Menunggu Persetujuan', 'Ditolak', 'On Progress', 'Done'])->default('Menunggu Pembayaran');
+            $table->enum('status', ['Menunggu Pembayaran', 'Menunggu Konfirmasi Pembayaran', 'Dibatalkan','Pembayaran Ditolak', 'Sesi Konsultasi', 'Selesai'])->default('Menunggu Pembayaran');
             $table->timestamps();
         });
     }
