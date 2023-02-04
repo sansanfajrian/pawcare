@@ -444,8 +444,8 @@ class ApiController extends Controller
                     'address' => $consultation->userDoctorDetail->user->address,
                     'vet_name' => $consultation->userDoctorDetail->vet_name,
                     'price' => $consultation->userDoctorDetail->price,
-                    'discount' => $doctor->discount,
-                    'discounted_price' => ($doctor->price - (($doctor->price * $doctor->discount)/100)),
+                    'discount' => $consultation->userDoctorDetail->discount,
+                    'discounted_price' => ($consultation->userDoctorDetail->price - (($consultation->userDoctorDetail->price * $consultation->userDoctorDetail->discount)/100)),
                     'description' => $consultation->userDoctorDetail->description,
                     'max_payment_time' => Carbon::parse($consultation->created_at)->addHours(24)->format('Y-m-d h:i:s'),
                 ];
@@ -514,7 +514,7 @@ class ApiController extends Controller
         return response()->json([
             'status' => 'OK',
             'results' => [
-                'banner_list' => $consultationList
+                'consultations' => $consultationList
             ]
         ]);
     }
