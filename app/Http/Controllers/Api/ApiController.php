@@ -206,6 +206,28 @@ class ApiController extends Controller
         ]);
     }
 
+    public function userDetail(Request $request, $id)
+    {
+        $token = $this::getCurrentToken($request);
+        $fetchUserList = User::where('id', '=', $id)->get();
+        $userList = [];
+        foreach($fetchUserList as $user) {
+            $userList[] = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'gender' => $user->gender,
+                'image'=> asset('uploads/profile/'.$user->image),
+                'banner'=> asset('uploads/banner/'.$user->banner)
+            ];
+        }
+
+        return response()->json([
+            'status' => 'OK',
+            'results' => [
+                'user_detail' => $userList
+            ]
+        ]);
+    }   
     public function doctorList(Request $request)
     {
         $request->validate([
