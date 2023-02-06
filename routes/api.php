@@ -21,8 +21,8 @@ Route::prefix('pawcare')->group(function() {
     Route::post('/login', 'Api\ApiController@login');
     Route::post('/register', 'Api\ApiController@registerUser');
     Route::post('/forgotpassword', 'Api\ApiController@forgotPassword');
-    Route::post('/user/edit/{id}', 'Api\ApiController@editUser');
-    Route::get('/user/detail/{id}', 'Api\ApiController@userDetail');
+    Route::post('/user/edit', 'Api\ApiController@editUser');
+    Route::get('/user/detail', 'Api\ApiController@userDetail');
     Route::get('/doctor/list', 'Api\ApiController@doctorList');
     Route::get('/doctor/detail/{id}', 'Api\ApiController@doctorDetail');
     Route::get('/banner/list', 'Api\ApiController@bannerList');

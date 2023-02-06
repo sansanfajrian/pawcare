@@ -111,10 +111,10 @@ class ApiController extends Controller
     }
 
 
-    public function editUser(Request $request, $id)
+    public function editUser(Request $request)
     {
         $token = $this::getCurrentToken($request);
-        $user = User::where('id', $id)->first();
+        $user = User::where('id', $token->user_id)->first();
         if(empty($user)) {
             return response()->json([
                 'status' => 'FAIL',
@@ -166,7 +166,7 @@ class ApiController extends Controller
             } else {
                 $bannername =  "default.png";
             }
-            $user = User::find($id);
+            $user = User::find($token->user_id);
             $user->name =  $request->name;
             $user->email = $request->email;
             $user->address = $request->address;
@@ -206,10 +206,10 @@ class ApiController extends Controller
         ]);
     }
 
-    public function userDetail(Request $request, $id)
+    public function userDetail(Request $request)
     {
         $token = $this::getCurrentToken($request);
-        $fetchUserList = User::where('id', '=', $id)->get();
+        $fetchUserList = User::where('id', '=', $token->user_id)->get();
         $userList = [];
         foreach($fetchUserList as $user) {
             $userList[] = [
