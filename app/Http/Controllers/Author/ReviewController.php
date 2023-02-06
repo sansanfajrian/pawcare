@@ -18,8 +18,6 @@ class ReviewController extends Controller
         $doctor = UserDoctorDetail::where('user_id', '=', $user->id)->first();
         #list of reviews
         $reviews = Review::all()->where('consultation.user_doctor_detail_id', $doctor->id);
-        return view('author.review', [
-            'data' => $reviews
-        ]);
+        return view('author.review', compact('reviews'));
     }
 }

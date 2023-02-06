@@ -38,12 +38,12 @@
                                     </tr>
                                 </tfoot>
                                 <tbody>
-                                @foreach ($data as $index => $item)
+                                @foreach ($reviews as $key => $item)
                                     <tr>
-                                        <th scope="row">{{$index + 1}}</th>
-                                        <td>{{$item['name']}}</td>
-                                        <td>{{$item['star']}}</td>
-                                        <td>{{$item['review']}}</td>
+                                        <th scope="row">{{$key + 1}}</th>
+                                        <td>{{$item->consultation->user->name}}</td>
+                                        <td>{{$item->star}}</td>
+                                        <td>{{$item->review}}</td>
                                         <td class="text-center">
                                             <a href="{{ route('author.dashboard-show-review',$item['id']) }}" class="btn btn-info waves-effect">
                                                 <i class="material-icons">details</i>
