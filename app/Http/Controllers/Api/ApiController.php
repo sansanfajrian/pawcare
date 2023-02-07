@@ -527,6 +527,7 @@ class ApiController extends Controller
             $consultationList[] = [
                 'id' => $consultation->id,
                 'doctor' => $consultation->userDoctorDetail->user->name,
+                'vet_name' => $consultation->userDoctorDetail->vet_name,
                 'price' => $consultation->userDoctorDetail->price,
                 'status'=> $consultation->status,
                 'created_at'=> $consultation->created_at->format('d-m-Y'),
