@@ -464,6 +464,7 @@ class ApiController extends Controller
                     'consultation_date' => $consultation->created_at->format('Y-m-d h:i:s'),
                     'patient' => $consultation->user->name,
                     'doctor' => $consultation->userDoctorDetail->user->name,
+                    'phone' => $consultation->userDoctorDetail->user->phone,
                     'address' => $consultation->userDoctorDetail->user->address,
                     'image' => asset('uploads/profile/'.$consultation->userDoctorDetail->user->image),
                     'vet_name' => $consultation->userDoctorDetail->vet_name,
