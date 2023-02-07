@@ -610,6 +610,7 @@ class ApiController extends Controller
 
                 $consultation = Consultation::find($consultation_id);
                 $consultation->status = "Menunggu Konfirmasi Pembayaran";
+                $consultation->save();
                 DB::commit();
                 $isSuccess = true;
             } catch (Exception $e) {
@@ -686,6 +687,52 @@ class ApiController extends Controller
         ]);
     }
 
+    public function reviewList(Request $request, $id)
+    {
+        $token = $this::getCurrentToken($request);
+
+        $isSuccess = false;
+
+        DB::beginTransaction();
+        try {
+            $message = "";
+            if(!$request->message){
+                $message = "-";
+            }else{
+                $message = $request->message;
+            }
+
+            $fetchReviewList = Review::select([
+                'reviews.*'
+            ])
+                ->orderBy('reviews.created_at', 'DESC')
+                ->join('consultations', 'consultations.id', 'reviews.consultation_id')
+                ->where('consultations.user_doctor_detail_id', '=', $id)
+                ->get();
+            $isSuccess = true;
+
+            $reviewList = [];
+            foreach($fetchReviewList as $rev) {
+                $reviewList[] = [
+                    'id' => $rev->id,
+                    'user_name'=> $rev->consultation->user->name,
+                    'star'=> $rev->star,
+                    'review' => $rev->review,
+                    'created_at' => $rev->created_at->format('Y-m-d h:i:s'),
+                ];
+            }
+        } catch (Exception $e) {
+            DB::rollback();
+            $isSuccess = false;
+        }
+
+        return response()->json([
+            'status' => $isSuccess ? 'OK' : 'FAIL',
+            'result' => [
+                'review' => $reviewList,
+            ]
+        ]);
+    }
 
     
 }
