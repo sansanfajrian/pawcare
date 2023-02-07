@@ -532,6 +532,8 @@ class ApiController extends Controller
                 'doctor' => $consultation->userDoctorDetail->user->name,
                 'vet_name' => $consultation->userDoctorDetail->vet_name,
                 'price' => $consultation->userDoctorDetail->price,
+                'discount' => $consultation->userDoctorDetail->discount ?? 0,
+                'discounted_price' => ($consultation->userDoctorDetail->price - (($consultation->userDoctorDetail->price * $consultation->userDoctorDetail->discount)/100)),
                 'status'=> $consultation->status,
                 'created_at'=> $consultation->created_at->format('d-m-Y'),
                 'updated_at'=> $consultation->updated_at->format('d-m-Y')
