@@ -464,7 +464,7 @@ class ApiController extends Controller
                     'patient' => $consultation->user->name,
                     'doctor' => $consultation->userDoctorDetail->user->name,
                     'address' => $consultation->userDoctorDetail->user->address,
-                    'image' => asset('uploads/profile/'.$consultation->userDoctorDetail->>user->image),
+                    'image' => asset('uploads/profile/'.$consultation->userDoctorDetail->user->image),
                     'vet_name' => $consultation->userDoctorDetail->vet_name,
                     'price' => $consultation->userDoctorDetail->price,
                     'discount' => $consultation->userDoctorDetail->discount,
