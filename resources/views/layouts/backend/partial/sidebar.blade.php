@@ -1,9 +1,10 @@
 <aside id="leftsidebar" class="sidebar">
     <!-- User Info -->
-    <div class="user-info">
-        <!-- <div class="image">
-            <img src="{{ Storage::disk('public')->url('profile/'.Auth::user()->image) }}" width="48" height="48" alt="User" />
-        </div> -->
+    <div class="user-info" >
+        <div class="image">
+            <img src="{{ url('uploads/profile/'.Auth::user()->image) }}" width="48" height="48" alt="User" />
+        </div>
+       
         <div class="name btn btn-danger" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white; opacity: 75%;">{{ Auth::user()->name }}</div>
         <div class="info-container">
             

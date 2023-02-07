@@ -19,37 +19,28 @@
                 </div>
                 <div class="body">
                     <div class="row">
-                        <div class="col-md-12">
+                    <div class="col-md-6">
                             <div class="form-group label-floating">
                                 <label class="control-label">Doctor Name</label>
-                                <input type="text" class="form-control" name="name" value="{{ $data['user_doctor_detail']['user']['name'] }}" disabled>
+                                <input type="text" class="form-control style-label-pawcare" name="name" value="{{ $data['user_doctor_detail']['user']['name'] }}" disabled>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-group label-floating">
                                 <label class="control-label">Patient Name</label>
-                                <input type="text" class="form-control" name="name" value="{{ $data['user']['name'] }}" disabled>
+                                <input type="text" class="form-control style-label-pawcare" name="name" value="{{ $data['user']['name'] }}" disabled>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-group label-floating">
                                 <label class="control-label">Status</label>
-                                <input type="text" class="form-control" name="name" value="{{ $data['status'] }}" disabled>
+                                <input type="text" class="form-control style-label-pawcare" name="name" value="{{ $data['status'] }}" disabled>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-group label-floating">
                                 <label class="control-label">Price</label>
-                                <input type="text" class="form-control" name="name" value="{{ $data['user_doctor_detail']['price'] }}" disabled>
+                                <input type="text" class="form-control style-label-pawcare" name="name" value="{{ $data['user_doctor_detail']['price'] }}" disabled>
                             </div>
                         </div>
                     </div>

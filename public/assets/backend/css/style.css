@@ -5045,6 +5045,17 @@ section.content {
 .form-horizontal .form-group {
   margin-bottom: 0; }
 
+.style-label-pawcare {
+  background-color: #FFFFFF !important;
+  border-width: 1px !important;
+  border-color: #FF9494 !important;
+  border-style: solid !important;
+  font-weight: 900;
+  border-radius: 40px !important;
+  color: #FF9494 !important;
+  padding: 0px 30px !important;
+}
+
 .form-group {
   width: 100%;
   margin-bottom: 25px; }
