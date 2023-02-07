@@ -337,6 +337,7 @@ class ApiController extends Controller
                 'id' => $doctor->user->id,
                 'user_doctor_detail_id' => $doctor->id,
                 'name' => $doctor->user->name,
+                'phone' => $doctor->user->phone,
                 'address' => $doctor->user->address,
                 'vet_name' => $doctor->vet_name,
                 'image'=> asset('uploads/profile/'.$doctor->user->image),
