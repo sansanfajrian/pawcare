@@ -111,10 +111,10 @@ class ApiController extends Controller
     }
 
 
-    public function editUser(Request $request, $id)
+    public function editUser(Request $request)
     {
         $token = $this::getCurrentToken($request);
-        $user = User::where('id', $id)->first();
+        $user = User::where('id', $token->user_id)->first();
         if(empty($user)) {
             return response()->json([
                 'status' => 'FAIL',
@@ -166,7 +166,7 @@ class ApiController extends Controller
             } else {
                 $bannername =  "default.png";
             }
-            $user = User::find($id);
+            $user = User::find($token->user_id);
             $user->name =  $request->name;
             $user->email = $request->email;
             $user->address = $request->address;
@@ -206,6 +206,28 @@ class ApiController extends Controller
         ]);
     }
 
+    public function userDetail(Request $request)
+    {
+        $token = $this::getCurrentToken($request);
+        $fetchUserList = User::where('id', '=', $token->user_id)->get();
+        $userList = [];
+        foreach($fetchUserList as $user) {
+            $userList[] = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'gender' => $user->gender,
+                'image'=> asset('uploads/profile/'.$user->image),
+                'banner'=> asset('uploads/banner/'.$user->banner)
+            ];
+        }
+
+        return response()->json([
+            'status' => 'OK',
+            'results' => [
+                'user_detail' => $userList
+            ]
+        ]);
+    }   
     public function doctorList(Request $request)
     {
         $request->validate([
@@ -264,7 +286,7 @@ class ApiController extends Controller
                 'vet_name' => $doctor->vet_name,
                 'image' => asset('uploads/profile/'.$doctor->user->image),
                 'price' => $doctor->price,
-                'discount' => $doctor->discount,
+                'discount' => $doctor->discount ?? 0,
                 'discounted_price' => ($doctor->price - (($doctor->price * $doctor->discount)/100)),
                 'avg_ratings' => $doctor->ratings,
                 'consultation_count' => $doctor->consultation_count ?? 0
@@ -315,12 +337,13 @@ class ApiController extends Controller
                 'id' => $doctor->user->id,
                 'user_doctor_detail_id' => $doctor->id,
                 'name' => $doctor->user->name,
+                'phone' => $doctor->user->phone,
                 'address' => $doctor->user->address,
                 'vet_name' => $doctor->vet_name,
                 'image'=> asset('uploads/profile/'.$doctor->user->image),
                 'banner'=> asset('uploads/banner/'.$doctor->user->banner),
                 'price' => $doctor->price,
-                'discount' => $doctor->discount,
+                'discount' => $doctor->discount ?? 0,
                 'discounted_price' => ($doctor->price - (($doctor->price * $doctor->discount)/100)),
                 'description' => $doctor->description,
                 'avg_ratings' => $doctor->ratings,
@@ -403,7 +426,7 @@ class ApiController extends Controller
                     'address' => $consultation->userDoctorDetail->user->address,
                     'vet_name' => $consultation->userDoctorDetail->vet_name,
                     'price' => $consultation->userDoctorDetail->price,
-                    'discount' => $doctor->discount,
+                    'discount' => $doctor->discount ?? 0,
                     'discounted_price' => ($doctor->price - (($doctor->price * $doctor->discount)/100)),
                     'description' => $consultation->userDoctorDetail->description,
                     'max_payment_time' => Carbon::parse($consultation->created_at)->addHours(24)->format('Y-m-d h:i:s'),
@@ -441,13 +464,18 @@ class ApiController extends Controller
                     'consultation_date' => $consultation->created_at->format('Y-m-d h:i:s'),
                     'patient' => $consultation->user->name,
                     'doctor' => $consultation->userDoctorDetail->user->name,
+                    'phone' => $consultation->userDoctorDetail->user->phone,
                     'address' => $consultation->userDoctorDetail->user->address,
+                    'image' => asset('uploads/profile/'.$consultation->userDoctorDetail->user->image),
                     'vet_name' => $consultation->userDoctorDetail->vet_name,
                     'price' => $consultation->userDoctorDetail->price,
-                    'discount' => $consultation->userDoctorDetail->discount,
+                    'discount' => $consultation->userDoctorDetail->discount ?? 0,
                     'discounted_price' => ($consultation->userDoctorDetail->price - (($consultation->userDoctorDetail->price * $consultation->userDoctorDetail->discount)/100)),
                     'description' => $consultation->userDoctorDetail->description,
                     'max_payment_time' => Carbon::parse($consultation->created_at)->addHours(24)->format('Y-m-d h:i:s'),
+                    'pay_at' => Carbon::parse(Payment::where('consultation_id', '=', $consultation->id)->firstOrFail()->created_at)->format('Y-m-d h:i:s'),
+                    'approved_at' => Carbon::parse($consultation->approved_at)->format('Y-m-d h:i:s'),
+                    'rejected_at' => Carbon::parse($consultation->rejected_at)->format('Y-m-d h:i:s'),
                 ];
             }
 
@@ -505,7 +533,10 @@ class ApiController extends Controller
             $consultationList[] = [
                 'id' => $consultation->id,
                 'doctor' => $consultation->userDoctorDetail->user->name,
+                'vet_name' => $consultation->userDoctorDetail->vet_name,
                 'price' => $consultation->userDoctorDetail->price,
+                'discount' => $consultation->userDoctorDetail->discount ?? 0,
+                'discounted_price' => ($consultation->userDoctorDetail->price - (($consultation->userDoctorDetail->price * $consultation->userDoctorDetail->discount)/100)),
                 'status'=> $consultation->status,
                 'created_at'=> $consultation->created_at->format('d-m-Y'),
                 'updated_at'=> $consultation->updated_at->format('d-m-Y')
@@ -584,6 +615,7 @@ class ApiController extends Controller
 
                 $consultation = Consultation::find($consultation_id);
                 $consultation->status = "Menunggu Konfirmasi Pembayaran";
+                $consultation->save();
                 DB::commit();
                 $isSuccess = true;
             } catch (Exception $e) {
@@ -660,6 +692,52 @@ class ApiController extends Controller
         ]);
     }
 
+    public function reviewList(Request $request, $id)
+    {
+        $token = $this::getCurrentToken($request);
+
+        $isSuccess = false;
+
+        DB::beginTransaction();
+        try {
+            $message = "";
+            if(!$request->message){
+                $message = "-";
+            }else{
+                $message = $request->message;
+            }
+
+            $fetchReviewList = Review::select([
+                'reviews.*'
+            ])
+                ->orderBy('reviews.created_at', 'DESC')
+                ->join('consultations', 'consultations.id', 'reviews.consultation_id')
+                ->where('consultations.user_doctor_detail_id', '=', $id)
+                ->get();
+            $isSuccess = true;
+
+            $reviewList = [];
+            foreach($fetchReviewList as $rev) {
+                $reviewList[] = [
+                    'id' => $rev->id,
+                    'user_name'=> $rev->consultation->user->name,
+                    'star'=> $rev->star,
+                    'review' => $rev->review,
+                    'created_at' => $rev->created_at->format('Y-m-d h:i:s'),
+                ];
+            }
+        } catch (Exception $e) {
+            DB::rollback();
+            $isSuccess = false;
+        }
+
+        return response()->json([
+            'status' => $isSuccess ? 'OK' : 'FAIL',
+            'result' => [
+                'review' => $reviewList,
+            ]
+        ]);
+    }
 
     
 }

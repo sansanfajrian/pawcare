@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Author;
 
 use App\Payment;
 use App\Consultation;
+use App\UserDoctorDetail;
 use Brian2694\Toastr\Facades\Toastr;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -24,9 +25,9 @@ class PaymentController extends Controller
     {
         $user = Auth::user();
 
-        $doctor_id = $user->userDoctorDetails->id;
+        $doctor = UserDoctorDetail::where('user_id', '=', $user->id)->first();
         $payments = Payment::all()
-        ->where('consultation.user_doctor_detail_id', $doctor_id);
+        ->where('consultation.user_doctor_detail_id', $doctor->id);
         return view('author.payment.index',compact('payments'));
     }
 

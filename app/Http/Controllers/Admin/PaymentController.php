@@ -41,6 +41,7 @@ class PaymentController extends Controller
         $consultation_id = Payment::find($id)->first()->consultation_id;
         $consultation = Consultation::find($consultation_id);
         $consultation->status = "Sesi Konsultasi";
+        $consultation->approved_at =  Carbon::now()->format("Y-m-d H:i:s");
         if($consultation->save()){
             Toastr::success('Payment Approved!','Success',["positionClass"=>"toast-top-right"]);
             return redirect()->back();
@@ -53,6 +54,7 @@ class PaymentController extends Controller
         $consultation_id = Payment::find($id)->first()->consultation_id;
         $consultation = Consultation::find($consultation_id);
         $consultation->status = "Pembayaran Ditolak";
+        $consultation->rejected_at =  Carbon::now()->format("Y-m-d H:i:s");
         if($consultation->save()){
             Toastr::success('Payment Denied!','Success',["positionClass"=>"toast-top-right"]);
             return redirect()->back();

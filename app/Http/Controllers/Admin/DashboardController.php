@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Consultation;
 use App\User;
+use App\AccountApproval;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -13,11 +14,27 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        
+        $user_count = User::where('role_id', 3)->count();
+        $new_users_today = User::where('role_id', 3)
+            ->whereDate('created_at', Carbon::today())->count();
         $author_count = User::where('role_id', 2)->count();
         $new_authors_today = User::where('role_id', 2)
             ->whereDate('created_at', Carbon::today())->count();
+        $consultation_count = Consultation::where('status', 'Selesai')->count();
+        $earning = DB::table('payments')
+        ->select(DB::raw("'SUM'('user_doctor_details.price')")
+        ->join(DB::raw(DB::table('consultations')
+            ->select('consultations.id', 'consultations.user_doctor_detail_id')
+            ->groupBy("'consultations.user_doctor_detail_id')") as a), function($join) {
+            $join->on('payments.consultation_id','=','a.id');
+        }
+        ->join('user_doctor_details','a.user_doctor_detail_id','=','user_doctor_details.id')
+        ->get();
+        $approvals = AccountApproval::all();
 
-        #list of users
+        #list of 
+        $users = User::where('role_id', 3)->get();
         $doctors = UserDoctorDetail::with(['user'])->get()
             ->map(function ($item) {
                 return [
@@ -30,7 +47,7 @@ class DashboardController extends Controller
                 ];
             });
 
-        return view('admin.dashboard', compact('author_count', 'new_authors_today'));
+        return view('admin.dashboard', compact('user_count','new_users_today','author_count', 'new_authors_today','users','doctors','consultation_count','approvals','earning'));
     }
 
     public function showDoctor($id)

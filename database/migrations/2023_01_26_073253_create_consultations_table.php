@@ -22,6 +22,8 @@ class CreateConsultationsTable extends Migration
             $table->foreign('user_doctor_detail_id')
                 ->references('id')->on('user_doctor_details');
             $table->enum('status', ['Menunggu Pembayaran', 'Menunggu Konfirmasi Pembayaran', 'Dibatalkan','Pembayaran Ditolak', 'Sesi Konsultasi', 'Selesai'])->default('Menunggu Pembayaran');
+            $table->date('approved_at')->nullable();
+            $table->date('rejected_at')->nullable();
             $table->timestamps();
         });
     }
