@@ -286,7 +286,7 @@ class ApiController extends Controller
                 'vet_name' => $doctor->vet_name,
                 'image' => asset('uploads/profile/'.$doctor->user->image),
                 'price' => $doctor->price,
-                'discount' => $doctor->discount,
+                'discount' => $doctor->discount ?? 0,
                 'discounted_price' => ($doctor->price - (($doctor->price * $doctor->discount)/100)),
                 'avg_ratings' => $doctor->ratings,
                 'consultation_count' => $doctor->consultation_count ?? 0
@@ -342,7 +342,7 @@ class ApiController extends Controller
                 'image'=> asset('uploads/profile/'.$doctor->user->image),
                 'banner'=> asset('uploads/banner/'.$doctor->user->banner),
                 'price' => $doctor->price,
-                'discount' => $doctor->discount,
+                'discount' => $doctor->discount ?? 0,
                 'discounted_price' => ($doctor->price - (($doctor->price * $doctor->discount)/100)),
                 'description' => $doctor->description,
                 'avg_ratings' => $doctor->ratings,
@@ -425,7 +425,7 @@ class ApiController extends Controller
                     'address' => $consultation->userDoctorDetail->user->address,
                     'vet_name' => $consultation->userDoctorDetail->vet_name,
                     'price' => $consultation->userDoctorDetail->price,
-                    'discount' => $doctor->discount,
+                    'discount' => $doctor->discount ?? 0,
                     'discounted_price' => ($doctor->price - (($doctor->price * $doctor->discount)/100)),
                     'description' => $consultation->userDoctorDetail->description,
                     'max_payment_time' => Carbon::parse($consultation->created_at)->addHours(24)->format('Y-m-d h:i:s'),
@@ -467,10 +467,12 @@ class ApiController extends Controller
                     'image' => asset('uploads/profile/'.$consultation->userDoctorDetail->user->image),
                     'vet_name' => $consultation->userDoctorDetail->vet_name,
                     'price' => $consultation->userDoctorDetail->price,
-                    'discount' => $consultation->userDoctorDetail->discount,
+                    'discount' => $consultation->userDoctorDetail->discount ?? 0,
                     'discounted_price' => ($consultation->userDoctorDetail->price - (($consultation->userDoctorDetail->price * $consultation->userDoctorDetail->discount)/100)),
                     'description' => $consultation->userDoctorDetail->description,
                     'max_payment_time' => Carbon::parse($consultation->created_at)->addHours(24)->format('Y-m-d h:i:s'),
+                    'approved_at' => $consultation->approved_at ?? '-',
+                    'rejected_at' => $consultation->rejected_at ?? '-',
                 ];
             }
 
