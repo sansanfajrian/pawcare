@@ -78,6 +78,7 @@ Route::group(['as' => 'admin.', 'prefix' => 'admin', 'namespace' => 'Admin', 'mi
 Route::group(['as' => 'author.', 'prefix' => 'author', 'namespace' => 'Author', 'middleware' => ['auth', 'author']], function () {
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
     Route::get('dashboard/consultation/{id}', 'DashboardController@showConsultation')->name('dashboard-show-consultation');
+    Route::post('dashboard/consultation/status/{id}', 'ConsultationController@status')->name('dashboard-status-consultation');
     Route::get('dashboard/review/{id}', 'DashboardController@showReview')->name('dashboard-show-review');
 
     Route::get('settings', 'SettingsController@index')->name('settings');

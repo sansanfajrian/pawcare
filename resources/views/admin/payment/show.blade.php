@@ -57,7 +57,7 @@
                                 </div>
                             </div>
 
-                            @if($payment->consultation->status == "Ditolak" || $payment->consultation->status == "Menunggu Konfirmasi Pembayaran" )
+                            @if($payment->consultation->status == "Pembayaran Ditolak" || $payment->consultation->status == "Menunggu Konfirmasi Pembayaran" )
                                 
                                 <form id="status-form-{{ $payment->id }}" method="post" action="{{ route('admin.payment.status',$payment->id ) }}"
                                     style="display: none;">
@@ -83,7 +83,7 @@
                                         event.preventDefault();
                                     }">Deny</button>
                             @else
-                                <a href="{{ route('author.payment.index') }}" class="btn btn-danger">Back</a>
+                                <a href="{{ route('admin.payment.index') }}" class="btn btn-danger">Back</a>
                             @endif
                     </div>
                 </div>

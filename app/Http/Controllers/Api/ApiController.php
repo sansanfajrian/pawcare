@@ -660,10 +660,6 @@ class ApiController extends Controller
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
 
-            $consultation_id = $request->consultation_id;
-            $consultation = Consultation::find($consultation_id);
-            $consultation->status = "Selesai";
-            $consultation->save();
             DB::commit();
             $isSuccess = true;
 

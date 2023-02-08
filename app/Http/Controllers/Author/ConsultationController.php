@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Author;
 
 use App\Consultation;
 use App\UserDoctorDetail;
+use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -36,5 +37,16 @@ class ConsultationController extends Controller
         return view('author.consultation', [
             'data' => $consultations
         ]);
+    }
+
+    public function status($id){
+        $consultation = Consultation::find($id);
+        $consultation->status = "Selesai";
+        if($consultation->save()){
+            Toastr::success('Consultation is done!','Success',["positionClass"=>"toast-top-right"]);
+            return redirect()->back();
+        }else{
+            return redirect()->back()->with('successMsg','Gagal di konfirmasi');
+        }
     }
 }
