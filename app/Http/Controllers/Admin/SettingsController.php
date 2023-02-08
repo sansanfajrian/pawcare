@@ -25,6 +25,7 @@ class SettingsController extends Controller
             'name' => 'required',
             'email' => 'required|email',
             'image' => 'required|image',
+            'image' => 'required|banner',
         ]);
         $image = $request->file('image');
         $slug = str_slug($request->name);
@@ -46,9 +47,30 @@ class SettingsController extends Controller
         } else {
             $imageName = $user->image;
         }
+
+        $banner = $request->file('banner');
+        $slug = str_slug($request->name);
+        if (isset($banner))
+        {
+            $currentDate = Carbon::now()->toDateString();
+            $bannerName = $slug.'-'.$currentDate.'-'.uniqid().'.'.$banner->getClientOriginalExtension();
+            if (!Storage::disk('public')->exists('uploads/banner'))
+            {
+                Storage::disk('public')->makeDirectory('uploads/banner');
+            }
+//            Delete old image form profile folder
+            if (Storage::disk('public')->exists('uploads/banner/'.$user->banner))
+            {
+                Storage::disk('public')->delete('uploads/banner/'.$user->banner);
+            }
+            $banner->move('uploads/banner',$bannerName);
+        } else {
+            $bannerName = $user->image;
+        }
         $user->name = $request->name;
         $user->email = $request->email;
         $user->image = $imageName;
+        $user->banner = $bannerName;
         $user->save();
         Toastr::success('Profile Successfully Updated','Success');
         return redirect()->back();
