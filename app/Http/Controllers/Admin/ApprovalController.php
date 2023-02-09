@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\AccountApproval;
+use App\Mail\SendEmail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\Controller;
 use App\UserDoctorDetail;
 use Brian2694\Toastr\Facades\Toastr;
@@ -136,6 +138,12 @@ class ApprovalController extends Controller
             $doctor = UserDoctorDetail::find($request->doctor_id);
             $doctor->is_approved = 1;
             $doctor->save();
+
+            $data = [
+                'name' => $doctor->user->name
+            ];
+
+            Mail::to($doctor->user->email)->send(new SendEmail($data));
         }
 
         # delete record on account_approvals
