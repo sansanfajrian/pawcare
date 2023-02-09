@@ -9,7 +9,7 @@
                     {{--<a class="logo" href="#"><img src="images/logo.png" alt="Logo Image"></a>--}}
                     <p class="copyright">{{ env('APP_NAME') }} @ {{ date('Y') }}. All rights reserved.</p>
                     <p class="copyright"><strong> Developed &amp; <i class="far fa-heart"></i> by </strong>
-                        <a href="https://www.pawcare.com" target="_blank">PawCare</a></p>
+                        <a href="https://www.pawcare.website" target="_blank">PawCare</a></p>
                     <ul class="icons">
                         <li><a target="_blank" href="https://www.facebook.com/pawcare"><i class="ion-social-facebook-outline"></i></a></li>
                         <li><a target="_blank" href="https://twitter.com/pawcare"><i class="ion-social-twitter-outline"></i></a></li>
