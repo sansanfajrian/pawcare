@@ -11,10 +11,10 @@
                     <p class="copyright"><strong> Developed &amp; <i class="far fa-heart"></i> by </strong>
                         <a href="https://www.pawcare.com" target="_blank">PawCare</a></p>
                     <ul class="icons">
-                        <li><a target="_blank" href="https://www.facebook.com/cip.fahim.me"><i class="ion-social-facebook-outline"></i></a></li>
-                        <li><a target="_blank" href="https://twitter.com/CipFahim"><i class="ion-social-twitter-outline"></i></a></li>
-                        <li><a target="_blank" href="https://www.instagram.com/cip.fahim/"><i class="ion-social-instagram-outline"></i></a></li>
-                        <li><a target="_blank" href="https://www.youtube.com/programmingkit"><i class="ion-social-youtube-outline"></i></a></li>
+                        <li><a target="_blank" href="https://www.facebook.com/pawcare"><i class="ion-social-facebook-outline"></i></a></li>
+                        <li><a target="_blank" href="https://twitter.com/pawcare"><i class="ion-social-twitter-outline"></i></a></li>
+                        <li><a target="_blank" href="https://www.instagram.com/pawcare/"><i class="ion-social-instagram-outline"></i></a></li>
+                        <li><a target="_blank" href="https://www.youtube.com/pawcare"><i class="ion-social-youtube-outline"></i></a></li>
                     </ul>
 
                 </div><!-- footer-section -->
