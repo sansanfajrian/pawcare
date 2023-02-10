@@ -663,6 +663,9 @@ class ApiController extends Controller
             DB::commit();
             $isSuccess = true;
 
+            $consultation = Consultation::find($request->consultation_id);
+            $consultation->status = "Selesai Mengulas";
+            $consultation->save();
             $fetchReviewList = Review::where('id', $reviewId)->get();
 
             $reviewList = [];
