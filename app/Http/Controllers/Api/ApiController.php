@@ -19,6 +19,8 @@ use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Str;
 
 class ApiController extends Controller
 {
@@ -212,9 +214,9 @@ class ApiController extends Controller
                 $user->image = 'default.png';
                 $user->banner = 'default.png';
             }
-
             if($user->save()){
                 $isSuccess = true;
+                DB::commit();
             }
             $fetchUserDetail = User::where('id','=',$user->id)->get();
             $userDetail = [];
@@ -242,6 +244,45 @@ class ApiController extends Controller
             'result' => [
                 'users' => $userDetail
             ]
+        ]);
+    }
+
+    public function changePassword(Request $request)
+    {
+        $token = $this::getCurrentToken($request);
+        $user = User::where('id', $token->user_id)->first();
+        if(empty($user)) {
+            return response()->json([
+                'status' => 'FAIL',
+                'message' => 'Invalid User ID'
+            ]);
+        }
+
+        $isSuccess = false;
+        DB::beginTransaction();
+        try{
+            if(Hash::check($request->old_password, $user->password)){
+                $user->password = Hash::make($request->new_password);
+                $user->setRememberToken(Str::random(60));
+                $user->save();
+                event(new PasswordReset($user));
+                DB::commit();
+                $isSuccess = true;
+            }else{
+                return response()->json([
+                    'status' => 'FAIL',
+                    'message' => 'Maaf kata sandi lama yang anda masukkan tidak sesuai, mohon coba lagi.'
+                ]);
+            }
+        } 
+        catch(Exception $e){
+            DB::rollback();
+            $isSuccess = false;
+        }
+
+        return response()->json([
+            'status' => $isSuccess ? 'OK' : 'FAIL',
+            'message' => $isSuccess ? 'Berhasil mengedit kata sandi!' : 'Gagal mengedit kata sandi!'
         ]);
     }
 
