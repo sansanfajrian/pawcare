@@ -255,6 +255,9 @@ class ApiController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'gender' => $user->gender,
+                'email' => $user->email,
+                'address' => $user->address,
+                'phone' => $user->phone,
                 'image'=> asset('uploads/profile/'.$user->image),
                 'banner'=> asset('uploads/banner/'.$user->banner)
             ];
