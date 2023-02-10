@@ -186,7 +186,7 @@ class ApiController extends Controller
                     'address' => $users->address,
                     'phone' => $users->phone,
                     'image' => asset('uploads/profile/'.$users->image),
-                    'banner' => asset('uploads/baner/'.$users->banner),
+                    'banner' => asset('uploads/banner/'.$users->banner),
                 ];
             }
         } 
