@@ -134,7 +134,6 @@ class ApiController extends Controller
         try{
             $slug = str_slug($request->name);
             $image = $request->file('image');
-            $imagename = "";
             if (isset($image))
             {
                 $currentDate = Carbon::now()->toDateString();
@@ -151,7 +150,6 @@ class ApiController extends Controller
             }
 
             $banner = $request->file('banner');
-            $bannername = "";
             if (isset($banner)) 
             {
                 $currentDate = Carbon::now()->toDateString();
