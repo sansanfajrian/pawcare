@@ -1,6 +1,6 @@
 <aside id="leftsidebar" class="sidebar">
     <!-- User Info -->
-    <div class="user-info" >
+    <div >
         <div class="image">
             <img src="{{ url('uploads/profile/'.Auth::user()->image) }}" width="48" height="48" alt="User" />
         </div>
