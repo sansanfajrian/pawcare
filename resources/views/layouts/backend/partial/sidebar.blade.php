@@ -1,15 +1,26 @@
 <aside id="leftsidebar" class="sidebar">
     <!-- User Info -->
     <div >
-        <div class="image">
-            <img src="{{ url('uploads/profile/'.Auth::user()->image) }}" width="48" height="48" alt="User" />
-        </div>
-       
+            <!-- <img src="{{ url('uploads/profile/'.Auth::user()->image) }}" width="48" height="48" alt="User" /> -->
+            
+    <div class="showcase">
+    <img src="{{ url('uploads/profile/'.Auth::user()->image) }}" width="48" height="48" alt="User" class="img-profile" />
+   <img src="{{ url('uploads/banner/'.Auth::user()->banner) }}" alt="banner-image" class="bg-image" style="    width: 100%;
+    height: 160px;
+    object-fit: cover;" />
+   
+</div>
+  
+    <div style="    position: absolute;
+    top: 0;">     
         <div class="name btn btn-danger" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white; opacity: 75%;">{{ Auth::user()->name }}</div>
         <div class="info-container">
             
-            <!-- <div class="email">{{ Auth::user()->email }}</div> -->
-            <div class="btn-group user-helper-dropdown">
+           
+            <div class="btn-group user-helper-dropdown" style="    background-color: #fb483a;
+    color: white;
+    opacity: 0.7;
+">
                 <i class="material-icons" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">keyboard_arrow_down</i>
                 <ul class="dropdown-menu pull-right">
 
@@ -32,6 +43,7 @@
                 </ul>
             </div>
         </div>
+</div>
     </div>
     <!-- #User Info -->
     <!-- Menu -->
@@ -153,7 +165,7 @@
     </div>
     <!-- #Menu -->
     <!-- Footer -->
-    <div class="legal">
+    <!-- <div class="legal">
         <div class="copyright">
             &copy; 2023 - {{ date("Y") }} All rights reserved. <br>
             <strong> Developed &amp; <i class="far fa-heart"></i> by </strong>
@@ -162,6 +174,39 @@
         <div class="version">
             <b>Version: </b> 1.0.5
         </div>
-    </div>
+    </div> -->
     <!-- #Footer -->
 </aside>
+<style>
+     .showcase {
+      position: relative;
+      background: rgba(0, 0, 0, 0.69);
+    }
+
+    .bg-image {
+      opacity: 0.7;
+    }
+
+    .bg-img-title {
+      position: absolute;
+      top: 420px;
+      left: 20px;
+    }
+    .img-profile {
+            /* margin: auto; */
+    /* display: block; */
+    position: absolute;
+    /* left: 42%; */
+    /* right: 50%; */
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    width: 120px;
+    height: 120px;
+    border-radius: 200px;
+    opacity: 4;
+    z-index: 10001;
+    }
+</style>

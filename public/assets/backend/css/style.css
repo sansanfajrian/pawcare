@@ -3,6 +3,23 @@
 footer {
   background-color: #FF9494  !important;
 }
+
+::-webkit-scrollbar-track
+{
+	background: #FFffff !important;
+	width: 8px;
+}
+::-webkit-scrollbar
+{
+	width: 9px;
+	background-color: #Ffffff;
+}
+
+::-webkit-scrollbar-thumb
+{
+	background: #FF9494;
+  border-radius: 10px;
+}
 .navbar {
   font-family: "Roboto", sans-serif;
   -webkit-border-radius: 0;
@@ -7583,6 +7600,9 @@ fieldset[disabled] .form-control {
     height: 90vh; }
     .sidebar .menu .list {
       list-style: none;
+      overflow: scroll !important;
+      width: auto;
+      height: 340px !important;
       padding-left: 0; }
       .sidebar .menu .list li.active > :first-child span {
         font-weight: bold; }
