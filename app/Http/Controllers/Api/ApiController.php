@@ -19,6 +19,8 @@ use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Str;
 
 class ApiController extends Controller
 {
@@ -134,8 +136,13 @@ class ApiController extends Controller
         try{
             $slug = str_slug($request->name);
             $image = $request->file('image');
-            $imagename = "";
-            if (isset($image))
+            $banner = $request->file('banner');
+            $user = User::find($token->user_id);
+            $user->name =  $request->name;
+            $user->email = $request->email;
+            $user->address = $request->address;
+            $user->phone = $request->phone;
+            if (isset($image) && isset($banner))
             {
                 $currentDate = Carbon::now()->toDateString();
                 $imagename = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
@@ -146,14 +153,40 @@ class ApiController extends Controller
                 }
                 $image->move('uploads/profile',$imagename);
 
-            } else {
-                $imagename =  "default.png";
-            }
+                $bannername = $slug.'-'.$currentDate.'-'.uniqid().'.'.$banner->getClientOriginalExtension();
 
-            $banner = $request->file('banner');
-            $bannername = "";
-            if (isset($banner)) 
-            {
+                if (!file_exists('uploads/banner')) 
+                {
+                    mkdir('uploads/banner',0777,true);
+                }
+                $banner->move('uploads/banner',$bannername);
+                
+                $user->image = $imagename;
+                $user->banner = $bannername;
+
+            }  else if((isset($image)) && (isset($banner) == false && $user->banner != "default.png")){
+                $currentDate = Carbon::now()->toDateString();
+                $imagename = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
+
+                if (!file_exists('uploads/profile'))
+                {
+                    mkdir('uploads/profile',0777,true);
+                }
+                $image->move('uploads/profile',$imagename);
+                $user->image = $imagename;
+                $user->banner = $user->banner;
+            } else if((isset($image)) && (isset($banner) == false && $user->banner == "default.png")){
+                $currentDate = Carbon::now()->toDateString();
+                $imagename = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
+
+                if (!file_exists('uploads/profile'))
+                {
+                    mkdir('uploads/profile',0777,true);
+                }
+                $image->move('uploads/profile',$imagename);
+                $user->image = $imagename;
+                $user->banner = 'default.png';
+            } else if((isset($banner)) && (isset($image) == false && $user->image != "default.png")){
                 $currentDate = Carbon::now()->toDateString();
                 $bannername = $slug.'-'.$currentDate.'-'.uniqid().'.'.$banner->getClientOriginalExtension();
 
@@ -162,20 +195,28 @@ class ApiController extends Controller
                     mkdir('uploads/banner',0777,true);
                 }
                 $banner->move('uploads/banner',$bannername);
+                $user->banner = $bannername;
+                $user->image = $user->image;
+            } else if((isset($banner)) && (isset($image) == false && $user->image == "default.png")){
+                $currentDate = Carbon::now()->toDateString();
+                $bannername = $slug.'-'.$currentDate.'-'.uniqid().'.'.$banner->getClientOriginalExtension();
 
-            } else {
-                $bannername =  "default.png";
+                if (!file_exists('uploads/banner')) 
+                {
+                    mkdir('uploads/banner',0777,true);
+                }
+                
+                $banner->move('uploads/banner',$bannername);
+                $user->banner = $bannername;
+                $user->image = 'default.png';
             }
-            $user = User::find($token->user_id);
-            $user->name =  $request->name;
-            $user->email = $request->email;
-            $user->address = $request->address;
-            $user->phone = $request->phone;
-            $user->image = $imagename;
-            $user->banner = $bannername;
-
+            else {
+                $user->image = 'default.png';
+                $user->banner = 'default.png';
+            }
             if($user->save()){
                 $isSuccess = true;
+                DB::commit();
             }
             $fetchUserDetail = User::where('id','=',$user->id)->get();
             $userDetail = [];
@@ -188,7 +229,7 @@ class ApiController extends Controller
                     'address' => $users->address,
                     'phone' => $users->phone,
                     'image' => asset('uploads/profile/'.$users->image),
-                    'banner' => asset('uploads/baner/'.$users->banner),
+                    'banner' => asset('uploads/banner/'.$users->banner),
                 ];
             }
         } 
@@ -206,6 +247,45 @@ class ApiController extends Controller
         ]);
     }
 
+    public function changePassword(Request $request)
+    {
+        $token = $this::getCurrentToken($request);
+        $user = User::where('id', $token->user_id)->first();
+        if(empty($user)) {
+            return response()->json([
+                'status' => 'FAIL',
+                'message' => 'Invalid User ID'
+            ]);
+        }
+
+        $isSuccess = false;
+        DB::beginTransaction();
+        try{
+            if(Hash::check($request->old_password, $user->password)){
+                $user->password = Hash::make($request->new_password);
+                $user->setRememberToken(Str::random(60));
+                $user->save();
+                event(new PasswordReset($user));
+                DB::commit();
+                $isSuccess = true;
+            }else{
+                return response()->json([
+                    'status' => 'FAIL',
+                    'message' => 'Maaf kata sandi lama yang anda masukkan tidak sesuai, mohon coba lagi.'
+                ]);
+            }
+        } 
+        catch(Exception $e){
+            DB::rollback();
+            $isSuccess = false;
+        }
+
+        return response()->json([
+            'status' => $isSuccess ? 'OK' : 'FAIL',
+            'message' => $isSuccess ? 'Berhasil mengedit kata sandi!' : 'Gagal mengedit kata sandi!'
+        ]);
+    }
+
     public function userDetail(Request $request)
     {
         $token = $this::getCurrentToken($request);
@@ -216,6 +296,9 @@ class ApiController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'gender' => $user->gender,
+                'email' => $user->email,
+                'address' => $user->address,
+                'phone' => $user->phone,
                 'image'=> asset('uploads/profile/'.$user->image),
                 'banner'=> asset('uploads/banner/'.$user->banner)
             ];
@@ -660,13 +743,12 @@ class ApiController extends Controller
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
 
-            $consultation_id = $request->consultation_id;
-            $consultation = Consultation::find($consultation_id);
-            $consultation->status = "Selesai";
-            $consultation->save();
             DB::commit();
             $isSuccess = true;
 
+            $consultation = Consultation::find($request->consultation_id);
+            $consultation->status = "Selesai Mengulas";
+            $consultation->save();
             $fetchReviewList = Review::where('id', $reviewId)->get();
 
             $reviewList = [];

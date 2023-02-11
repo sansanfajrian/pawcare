@@ -44,7 +44,19 @@
                             </div>
                         </div>
                     </div>
-
+                    @if($data['status'] == "Sesi Konsultasi")
+                        <form id="status-form-{{ $data['id'] }}" method="post" action="{{ route('author.dashboard-status-consultation',$data['id'])  }}"
+                        style="display: none;">
+                        @csrf
+                                </form>
+                                <button type="button" class="btn btn-success btn-sm" name="action" value="accept"
+                                    onclick="if(confirm('Are you sure?')){
+                                    event.preventDefault();
+                                    document.getElementById('status-form-{{ $data['id'] }}').submit();
+                                    }else {
+                                        event.preventDefault();
+                                    }">Done</button>
+                    @endif
                     <a href="{{ route('author.consultations.index') }}" class="btn btn-danger">Back</a>
                 </div>
             </div>
