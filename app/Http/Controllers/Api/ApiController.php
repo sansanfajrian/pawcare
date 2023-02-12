@@ -126,94 +126,13 @@ class ApiController extends Controller
 
         $isSuccess = false;
 
-
-        $this->validate($request,[
-            'image' => 'mimes:jpeg,bmp,png,jpg',
-            'banner' => 'mimes:jpeg,bmp,png,jpg',
-        ]);
-
         DB::beginTransaction();
         try{
-            $slug = str_slug($request->name);
-            $image = $request->file('image');
-            $banner = $request->file('banner');
             $user = User::find($token->user_id);
             $user->name =  $request->name;
             $user->email = $request->email;
             $user->address = $request->address;
             $user->phone = $request->phone;
-            if (isset($image) && isset($banner))
-            {
-                $currentDate = Carbon::now()->toDateString();
-                $imagename = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
-
-                if (!file_exists('uploads/profile'))
-                {
-                    mkdir('uploads/profile',0777,true);
-                }
-                $image->move('uploads/profile',$imagename);
-
-                $bannername = $slug.'-'.$currentDate.'-'.uniqid().'.'.$banner->getClientOriginalExtension();
-
-                if (!file_exists('uploads/banner')) 
-                {
-                    mkdir('uploads/banner',0777,true);
-                }
-                $banner->move('uploads/banner',$bannername);
-                
-                $user->image = $imagename;
-                $user->banner = $bannername;
-
-            }  else if((isset($image)) && (isset($banner) == false && $user->banner != "default.png")){
-                $currentDate = Carbon::now()->toDateString();
-                $imagename = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
-
-                if (!file_exists('uploads/profile'))
-                {
-                    mkdir('uploads/profile',0777,true);
-                }
-                $image->move('uploads/profile',$imagename);
-                $user->image = $imagename;
-                $user->banner = $user->banner;
-            } else if((isset($image)) && (isset($banner) == false && $user->banner == "default.png")){
-                $currentDate = Carbon::now()->toDateString();
-                $imagename = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
-
-                if (!file_exists('uploads/profile'))
-                {
-                    mkdir('uploads/profile',0777,true);
-                }
-                $image->move('uploads/profile',$imagename);
-                $user->image = $imagename;
-                $user->banner = 'default.png';
-            } else if((isset($banner)) && (isset($image) == false && $user->image != "default.png")){
-                $currentDate = Carbon::now()->toDateString();
-                $bannername = $slug.'-'.$currentDate.'-'.uniqid().'.'.$banner->getClientOriginalExtension();
-
-                if (!file_exists('uploads/banner')) 
-                {
-                    mkdir('uploads/banner',0777,true);
-                }
-                $banner->move('uploads/banner',$bannername);
-                $user->banner = $bannername;
-                $user->image = $user->image;
-            } else if((isset($banner)) && (isset($image) == false && $user->image == "default.png")){
-                $currentDate = Carbon::now()->toDateString();
-                $bannername = $slug.'-'.$currentDate.'-'.uniqid().'.'.$banner->getClientOriginalExtension();
-
-                if (!file_exists('uploads/banner')) 
-                {
-                    mkdir('uploads/banner',0777,true);
-                }
-                
-                $banner->move('uploads/banner',$bannername);
-                $user->banner = $bannername;
-                $user->image = 'default.png';
-            }
-            else {
-                $user->image = 'default.png';
-                $user->banner = 'default.png';
-            }
             if($user->save()){
                 $isSuccess = true;
                 DB::commit();
@@ -241,6 +160,136 @@ class ApiController extends Controller
         return response()->json([
             'status' => $isSuccess ? 'OK' : 'FAIL',
             'message' => $isSuccess ? 'Berhasil Mengedit User!' : 'Gagal Mengedit User!',
+            'result' => [
+                'users' => $userDetail
+            ]
+        ]);
+    }
+
+    public function editBannerImage(Request $request)
+    {
+        $token = $this::getCurrentToken($request);
+        $user = User::where('id', $token->user_id)->first();
+        if(empty($user)) {
+            return response()->json([
+                'status' => 'FAIL',
+                'message' => 'Invalid User ID'
+            ]);
+        }
+
+        $isSuccess = false;
+
+
+        $this->validate($request,[
+            'banner' => 'mimes:jpeg,bmp,png,jpg'
+        ]);
+
+        DB::beginTransaction();
+        try{
+            $slug = str_slug($request->name);
+            $image = $request->file('banner');
+            $user = User::find($token->user_id);
+            if (isset($image))
+            {
+                $currentDate = Carbon::now()->toDateString();
+                $imagename = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
+
+                if (!file_exists('uploads/banner'))
+                {
+                    mkdir('uploads/banner',0777,true);
+                }
+                $image->move('uploads/banner',$imagename);
+                
+                $user->banner = $imagename;
+
+            } else {
+                $user->banner = 'default.png';
+            }
+            if($user->save()){
+                $isSuccess = true;
+                DB::commit();
+            }
+            $fetchUserDetail = User::where('id','=',$user->id)->get();
+            $userDetail = [];
+            foreach($fetchUserDetail as $users) {
+                $userDetail[] = [
+                    'banner' => asset('uploads/banner/'.$users->banner)
+                ];
+            }
+        } 
+        catch(Exception $e){
+            DB::rollback();
+            $isSuccess = false;
+        }
+
+        return response()->json([
+            'status' => $isSuccess ? 'OK' : 'FAIL',
+            'message' => $isSuccess ? 'Berhasil Mengedit Profile Image!' : 'Gagal Mengedit Profile Image!',
+            'result' => [
+                'users' => $userDetail
+            ]
+        ]);
+    }
+
+    public function editProfileImage(Request $request)
+    {
+        $token = $this::getCurrentToken($request);
+        $user = User::where('id', $token->user_id)->first();
+        if(empty($user)) {
+            return response()->json([
+                'status' => 'FAIL',
+                'message' => 'Invalid User ID'
+            ]);
+        }
+
+        $isSuccess = false;
+
+
+        $this->validate($request,[
+            'image' => 'mimes:jpeg,bmp,png,jpg'
+        ]);
+
+        DB::beginTransaction();
+        try{
+            $slug = str_slug($request->name);
+            $image = $request->file('image');
+            $user = User::find($token->user_id);
+            if (isset($image))
+            {
+                $currentDate = Carbon::now()->toDateString();
+                $imagename = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
+
+                if (!file_exists('uploads/profile'))
+                {
+                    mkdir('uploads/profile',0777,true);
+                }
+                $image->move('uploads/profile',$imagename);
+                
+                $user->image = $imagename;
+
+            } else {
+                $user->image = 'default.png';
+            }
+            if($user->save()){
+                $isSuccess = true;
+                DB::commit();
+            }
+            $fetchUserDetail = User::where('id','=',$user->id)->get();
+            $userDetail = [];
+            foreach($fetchUserDetail as $users) {
+                $userDetail[] = [
+                    'image' => asset('uploads/profile/'.$users->image)
+                ];
+            }
+        } 
+        catch(Exception $e){
+            DB::rollback();
+            $isSuccess = false;
+        }
+
+        return response()->json([
+            'status' => $isSuccess ? 'OK' : 'FAIL',
+            'message' => $isSuccess ? 'Berhasil Mengedit Profile Image!' : 'Gagal Mengedit Profile Image!',
             'result' => [
                 'users' => $userDetail
             ]
