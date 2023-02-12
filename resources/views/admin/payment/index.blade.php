@@ -29,6 +29,7 @@
                                     <th>User</th>
                                     <th>Bank Name</th>
                                     <th>Sender Name</th>
+                                    <th>Status</th>
                                     <th>Created At</th>
                                     <th>Updated At</th>
                                     <th>Action</th>
@@ -41,6 +42,7 @@
                                     <th>User</th>
                                     <th>Bank Name</th>
                                     <th>Sender Name</th>
+                                    <th>Status</th>
                                     <th>Created At</th>
                                     <th>Updated At</th>
                                     <th>Action</th>
@@ -54,6 +56,11 @@
                                             <td>{{ $payment->consultation->user->name}}</td>
                                             <td>{{ $payment->bank_name }}</td>
                                             <td>{{ $payment->sender_name }}</td>
+                                            @if($payment->consultation->status == "Pembayaran Ditolak" || $payment->consultation->status == "Menunggu Konfirmasi Pembayaran" )
+                                                <td>{{ $payment->consultation->status }}</td>
+                                            @else
+                                                <td>-</td>
+                                            @endif
                                             <td>{{ $payment->created_at }}</td>
                                             <td>{{ $payment->updated_at }}</td>
                                             <td class="text-center">

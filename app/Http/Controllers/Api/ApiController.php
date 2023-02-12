@@ -420,7 +420,7 @@ class ApiController extends Controller
                 'price' => $doctor->price,
                 'discount' => $doctor->discount ?? 0,
                 'discounted_price' => ($doctor->price - (($doctor->price * $doctor->discount)/100)),
-                'avg_ratings' => $doctor->ratings,
+                'avg_ratings' => number_format((float)($doctor->ratings), 1),
                 'consultation_count' => $doctor->consultation_count ?? 0
             ];
         }
@@ -478,7 +478,7 @@ class ApiController extends Controller
                 'discount' => $doctor->discount ?? 0,
                 'discounted_price' => ($doctor->price - (($doctor->price * $doctor->discount)/100)),
                 'description' => $doctor->description,
-                'avg_ratings' => $doctor->ratings,
+                'avg_ratings' => number_format((float)($doctor->ratings), 1),
                 'consultation_count' => $doctor->consultation_count ?? 0
             ];
         }
@@ -864,7 +864,7 @@ class ApiController extends Controller
 
         return response()->json([
             'status' => $isSuccess ? 'OK' : 'FAIL',
-            'result' => [
+            'results' => [
                 'review' => $reviewList,
             ]
         ]);
