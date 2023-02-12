@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-
 use App\Payment;
 use App\Consultation;
 use Brian2694\Toastr\Facades\Toastr;
@@ -31,14 +30,13 @@ class PaymentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
+    public function show($id) {
         $payment = Payment::find($id);
         return view('admin.payment.show', compact('payment'));
     }
 
     public function status($id){
-        $consultation_id = Payment::find($id)->first()->consultation_id;
+        $consultation_id = Payment::find($id)->consultation_id;
         $consultation = Consultation::find($consultation_id);
         $consultation->status = "Sesi Konsultasi";
         $consultation->approved_at =  Carbon::now()->format("Y-m-d H:i:s");
@@ -51,7 +49,7 @@ class PaymentController extends Controller
     }
 
     public function statusDeny($id){
-        $consultation_id = Payment::find($id)->first()->consultation_id;
+        $consultation_id = Payment::find($id)->consultation_id;
         $consultation = Consultation::find($consultation_id);
         $consultation->status = "Pembayaran Ditolak";
         $consultation->rejected_at =  Carbon::now()->format("Y-m-d H:i:s");

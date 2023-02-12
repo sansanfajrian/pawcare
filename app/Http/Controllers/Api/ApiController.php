@@ -126,94 +126,13 @@ class ApiController extends Controller
 
         $isSuccess = false;
 
-
-        $this->validate($request,[
-            'image' => 'mimes:jpeg,bmp,png,jpg',
-            'banner' => 'mimes:jpeg,bmp,png,jpg',
-        ]);
-
         DB::beginTransaction();
         try{
-            $slug = str_slug($request->name);
-            $image = $request->file('image');
-            $banner = $request->file('banner');
             $user = User::find($token->user_id);
             $user->name =  $request->name;
             $user->email = $request->email;
             $user->address = $request->address;
             $user->phone = $request->phone;
-            if (isset($image) && isset($banner))
-            {
-                $currentDate = Carbon::now()->toDateString();
-                $imagename = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
-
-                if (!file_exists('uploads/profile'))
-                {
-                    mkdir('uploads/profile',0777,true);
-                }
-                $image->move('uploads/profile',$imagename);
-
-                $bannername = $slug.'-'.$currentDate.'-'.uniqid().'.'.$banner->getClientOriginalExtension();
-
-                if (!file_exists('uploads/banner')) 
-                {
-                    mkdir('uploads/banner',0777,true);
-                }
-                $banner->move('uploads/banner',$bannername);
-                
-                $user->image = $imagename;
-                $user->banner = $bannername;
-
-            }  else if((isset($image)) && (isset($banner) == false && $user->banner != "default.png")){
-                $currentDate = Carbon::now()->toDateString();
-                $imagename = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
-
-                if (!file_exists('uploads/profile'))
-                {
-                    mkdir('uploads/profile',0777,true);
-                }
-                $image->move('uploads/profile',$imagename);
-                $user->image = $imagename;
-                $user->banner = $user->banner;
-            } else if((isset($image)) && (isset($banner) == false && $user->banner == "default.png")){
-                $currentDate = Carbon::now()->toDateString();
-                $imagename = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
-
-                if (!file_exists('uploads/profile'))
-                {
-                    mkdir('uploads/profile',0777,true);
-                }
-                $image->move('uploads/profile',$imagename);
-                $user->image = $imagename;
-                $user->banner = 'default.png';
-            } else if((isset($banner)) && (isset($image) == false && $user->image != "default.png")){
-                $currentDate = Carbon::now()->toDateString();
-                $bannername = $slug.'-'.$currentDate.'-'.uniqid().'.'.$banner->getClientOriginalExtension();
-
-                if (!file_exists('uploads/banner')) 
-                {
-                    mkdir('uploads/banner',0777,true);
-                }
-                $banner->move('uploads/banner',$bannername);
-                $user->banner = $bannername;
-                $user->image = $user->image;
-            } else if((isset($banner)) && (isset($image) == false && $user->image == "default.png")){
-                $currentDate = Carbon::now()->toDateString();
-                $bannername = $slug.'-'.$currentDate.'-'.uniqid().'.'.$banner->getClientOriginalExtension();
-
-                if (!file_exists('uploads/banner')) 
-                {
-                    mkdir('uploads/banner',0777,true);
-                }
-                
-                $banner->move('uploads/banner',$bannername);
-                $user->banner = $bannername;
-                $user->image = 'default.png';
-            }
-            else {
-                $user->image = 'default.png';
-                $user->banner = 'default.png';
-            }
             if($user->save()){
                 $isSuccess = true;
                 DB::commit();
@@ -241,6 +160,136 @@ class ApiController extends Controller
         return response()->json([
             'status' => $isSuccess ? 'OK' : 'FAIL',
             'message' => $isSuccess ? 'Berhasil Mengedit User!' : 'Gagal Mengedit User!',
+            'result' => [
+                'users' => $userDetail
+            ]
+        ]);
+    }
+
+    public function editBannerImage(Request $request)
+    {
+        $token = $this::getCurrentToken($request);
+        $user = User::where('id', $token->user_id)->first();
+        if(empty($user)) {
+            return response()->json([
+                'status' => 'FAIL',
+                'message' => 'Invalid User ID'
+            ]);
+        }
+
+        $isSuccess = false;
+
+
+        $this->validate($request,[
+            'banner' => 'mimes:jpeg,bmp,png,jpg'
+        ]);
+
+        DB::beginTransaction();
+        try{
+            $slug = str_slug($request->name);
+            $image = $request->file('banner');
+            $user = User::find($token->user_id);
+            if (isset($image))
+            {
+                $currentDate = Carbon::now()->toDateString();
+                $imagename = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
+
+                if (!file_exists('uploads/banner'))
+                {
+                    mkdir('uploads/banner',0777,true);
+                }
+                $image->move('uploads/banner',$imagename);
+                
+                $user->banner = $imagename;
+
+            } else {
+                $user->banner = 'default.png';
+            }
+            if($user->save()){
+                $isSuccess = true;
+                DB::commit();
+            }
+            $fetchUserDetail = User::where('id','=',$user->id)->get();
+            $userDetail = [];
+            foreach($fetchUserDetail as $users) {
+                $userDetail[] = [
+                    'banner' => asset('uploads/banner/'.$users->banner)
+                ];
+            }
+        } 
+        catch(Exception $e){
+            DB::rollback();
+            $isSuccess = false;
+        }
+
+        return response()->json([
+            'status' => $isSuccess ? 'OK' : 'FAIL',
+            'message' => $isSuccess ? 'Berhasil Mengedit Profile Image!' : 'Gagal Mengedit Profile Image!',
+            'result' => [
+                'users' => $userDetail
+            ]
+        ]);
+    }
+
+    public function editProfileImage(Request $request)
+    {
+        $token = $this::getCurrentToken($request);
+        $user = User::where('id', $token->user_id)->first();
+        if(empty($user)) {
+            return response()->json([
+                'status' => 'FAIL',
+                'message' => 'Invalid User ID'
+            ]);
+        }
+
+        $isSuccess = false;
+
+
+        $this->validate($request,[
+            'image' => 'mimes:jpeg,bmp,png,jpg'
+        ]);
+
+        DB::beginTransaction();
+        try{
+            $slug = str_slug($request->name);
+            $image = $request->file('image');
+            $user = User::find($token->user_id);
+            if (isset($image))
+            {
+                $currentDate = Carbon::now()->toDateString();
+                $imagename = $slug.'-'.$currentDate.'-'.uniqid().'.'.$image->getClientOriginalExtension();
+
+                if (!file_exists('uploads/profile'))
+                {
+                    mkdir('uploads/profile',0777,true);
+                }
+                $image->move('uploads/profile',$imagename);
+                
+                $user->image = $imagename;
+
+            } else {
+                $user->image = 'default.png';
+            }
+            if($user->save()){
+                $isSuccess = true;
+                DB::commit();
+            }
+            $fetchUserDetail = User::where('id','=',$user->id)->get();
+            $userDetail = [];
+            foreach($fetchUserDetail as $users) {
+                $userDetail[] = [
+                    'image' => asset('uploads/profile/'.$users->image)
+                ];
+            }
+        } 
+        catch(Exception $e){
+            DB::rollback();
+            $isSuccess = false;
+        }
+
+        return response()->json([
+            'status' => $isSuccess ? 'OK' : 'FAIL',
+            'message' => $isSuccess ? 'Berhasil Mengedit Profile Image!' : 'Gagal Mengedit Profile Image!',
             'result' => [
                 'users' => $userDetail
             ]
@@ -371,7 +420,7 @@ class ApiController extends Controller
                 'price' => $doctor->price,
                 'discount' => $doctor->discount ?? 0,
                 'discounted_price' => ($doctor->price - (($doctor->price * $doctor->discount)/100)),
-                'avg_ratings' => $doctor->ratings,
+                'avg_ratings' => number_format((float)($doctor->ratings), 1),
                 'consultation_count' => $doctor->consultation_count ?? 0
             ];
         }
@@ -429,7 +478,7 @@ class ApiController extends Controller
                 'discount' => $doctor->discount ?? 0,
                 'discounted_price' => ($doctor->price - (($doctor->price * $doctor->discount)/100)),
                 'description' => $doctor->description,
-                'avg_ratings' => $doctor->ratings,
+                'avg_ratings' => number_format((float)($doctor->ratings), 1),
                 'consultation_count' => $doctor->consultation_count ?? 0
             ];
         }
@@ -488,7 +537,7 @@ class ApiController extends Controller
             }else{
                 $message = $request->message;
             }
-            $doctor = UserDoctorDetail::where('id', $request->user_doctor_detail_id)->first();
+            $doctor = UserDoctorDetail::where('id', $request->user_doctor_detail_id)->firstOrFail();
 
             $consultationId = Consultation::insertGetId([
                 'user_id' => $user->id,
@@ -534,34 +583,29 @@ class ApiController extends Controller
     public function consultationDetail(Request $request, $id)
     {
         $token = $this::getCurrentToken($request);
-        $fetchConsultationList = Consultation::select([
-            'consultations.*',
-        ])
-            ->where('consultations.id', '=', $id)
-            ->get();
-        $consultationDetail = [];
-            foreach($fetchConsultationList as $consultation) {
-                $consultationDetail[] = [
-                    'id' => $consultation->id,
-                    'status' => $consultation->status,
-                    'consultation_date' => $consultation->created_at->format('Y-m-d h:i:s'),
-                    'patient' => $consultation->user->name,
-                    'doctor' => $consultation->userDoctorDetail->user->name,
-                    'phone' => $consultation->userDoctorDetail->user->phone,
-                    'address' => $consultation->userDoctorDetail->user->address,
-                    'image' => asset('uploads/profile/'.$consultation->userDoctorDetail->user->image),
-                    'vet_name' => $consultation->userDoctorDetail->vet_name,
-                    'price' => $consultation->userDoctorDetail->price,
-                    'discount' => $consultation->userDoctorDetail->discount ?? 0,
-                    'discounted_price' => ($consultation->userDoctorDetail->price - (($consultation->userDoctorDetail->price * $consultation->userDoctorDetail->discount)/100)),
-                    'description' => $consultation->userDoctorDetail->description,
-                    'max_payment_time' => Carbon::parse($consultation->created_at)->addHours(24)->format('Y-m-d h:i:s'),
-                    'pay_at' => Carbon::parse(Payment::where('consultation_id', '=', $consultation->id)->firstOrFail()->created_at)->format('Y-m-d h:i:s'),
-                    'approved_at' => Carbon::parse($consultation->approved_at)->format('Y-m-d h:i:s'),
-                    'rejected_at' => Carbon::parse($consultation->rejected_at)->format('Y-m-d h:i:s'),
-                ];
-            }
-
+        $consultation = Consultation::find($id);
+        $payment = Payment::where('id', $id)->first();
+        
+        $consultationDetail[] = [
+            'id' => $consultation->id,
+            'status' => $consultation->status,
+            'consultation_date' => $consultation->created_at->format('Y-m-d h:i:s'),
+            'patient' => $consultation->user->name,
+            'doctor' => $consultation->userDoctorDetail->user->name,
+            'phone' => $consultation->userDoctorDetail->user->phone,
+            'address' => $consultation->userDoctorDetail->user->address,
+            'image' => asset('uploads/profile/'.$consultation->userDoctorDetail->user->image),
+            'vet_name' => $consultation->userDoctorDetail->vet_name,
+            'price' => $consultation->userDoctorDetail->price,
+            'discount' => $consultation->userDoctorDetail->discount ?? 0,
+            'discounted_price' => ($consultation->userDoctorDetail->price - (($consultation->userDoctorDetail->price * $consultation->userDoctorDetail->discount)/100)),
+            'description' => $consultation->userDoctorDetail->description,
+            'max_payment_time' => Carbon::parse($consultation->created_at)->addHours(24)->format('Y-m-d h:i:s'),
+            'pay_at' => is_null($payment) ? "-" : $payment->created_at->format('Y-m-d h:i:s'),
+            'approved_at' => $consultation->approved_at ? Carbon::parse($consultation->approved_at)->addHours(24)->format('Y-m-d h:i:s') : "-",
+            'rejected_at' =>  $consultation->rejected_at ? Carbon::parse($consultation->rejected_at)->addHours(24)->format('Y-m-d h:i:s') : "-",
+        ];
+    
         return response()->json([
             'status' => 'OK',
             'results' => [
@@ -803,6 +847,7 @@ class ApiController extends Controller
                 $reviewList[] = [
                     'id' => $rev->id,
                     'user_name'=> $rev->consultation->user->name,
+                    'user_image'=> asset('uploads/profile/'.$rev->consultation->user->image),
                     'star'=> $rev->star,
                     'review' => $rev->review,
                     'created_at' => $rev->created_at->format('Y-m-d h:i:s'),
@@ -815,7 +860,7 @@ class ApiController extends Controller
 
         return response()->json([
             'status' => $isSuccess ? 'OK' : 'FAIL',
-            'result' => [
+            'results' => [
                 'review' => $reviewList,
             ]
         ]);
