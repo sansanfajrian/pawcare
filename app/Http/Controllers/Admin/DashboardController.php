@@ -23,14 +23,16 @@ class DashboardController extends Controller
         $new_authors_today = User::where('role_id', 2)
             ->whereDate('created_at', Carbon::today())->count();
         $consultation_count = Consultation::where('status', 'Selesai')->count();
-        /*$earning = Payment::select(['SUM(user_doctor_details.price)'])
-        ->join('consultations','consultations.id', 'consultations.user_doctor_detail_id')
-        ->join('user_doctor_details','consultations.user_doctor_detail_id','user_doctor_details.id')
-        ->get();*/
+        // $earning = Payment::select(['SUM(user_doctor_details.price)'])
+        // ->join('consultations','consultations.id', 'consultations.user_doctor_detail_id')
+        // ->join('user_doctor_details','consultations.user_doctor_detail_id','user_doctor_details.id')
+        // ->get();
+        $payment = Payment::all();
         $approvals = AccountApproval::all();
-
+        $new_doctors_today = UserDoctorDetail::whereDate('created_at', Carbon::today())->count();
         #list of 
         $users = User::where('role_id', 3)->get();
+        $mytime = Carbon::today()->toDateString();
         $doctors = UserDoctorDetail::with(['user'])->get()
             ->map(function ($item) {
                 return [
@@ -43,7 +45,7 @@ class DashboardController extends Controller
                 ];
             });
 
-        return view('admin.dashboard', compact('user_count','new_users_today','author_count', 'new_authors_today','users','doctors','consultation_count','approvals'));
+        return view('admin.dashboard', compact('user_count','new_users_today',  'new_doctors_today', 'payment', 'mytime', 'author_count', 'new_authors_today','users','doctors','consultation_count','approvals'));
     }
 
     public function showDoctor($id)

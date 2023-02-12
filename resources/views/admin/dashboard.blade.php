@@ -8,8 +8,48 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="block-header">
-        <h2>DASHBOARD</h2>
+    <div class="block-header" style="height: auto;">
+    <div style="display: flex; margin-bottom: 1rem;">
+    <div style=" 
+    padding: 1rem;
+    background-color: #ffffff;
+    border: solid #fb483a;
+    margin-top: 3rem;
+    margin-right: 2rem;
+    ">
+        <h2 style="color: #fb483a !important;">User Baru hari ini ( {{ $mytime }} ):</h2> 
+        <h2 style="color: #000000 !important; font-weight: 900; margin-top: 1rem !important">{{ $new_users_today}} User </h2>
+    </div>
+    <div style=" 
+    padding: 1rem;
+    background-color: #ffffff;
+    border: solid #fb483a;
+    margin-top: 3rem;">
+        <h2 style="color: #fb483a !important;">Dokter Baru hari ini ( {{ $mytime }} ):</h2> 
+        <h2 style="color: #000000 !important; font-weight: 900; margin-top: 1rem !important">{{ $new_doctors_today}} Dokter </h2>
+    </div>
+    </div>
+    <div style=" 
+    padding: 1rem;
+    background-color: #ffffff;
+    border: solid #fb483a;
+    width: 50%;
+    margin-top: 3rem;">
+        <h2 style="color: #fb483a !important;">Jumlah Konsultasi </h2> 
+        <h2 style="color: #000000 !important; font-weight: 900; margin-top: 1rem !important">{{ $consultation_count}} User </h2>
+    </div>
+    
+    <!-- <h2 style="color: #ffffff !important; margin-bottom: 1rem;">Payment</h2>  -->
+    
+  
+    <!-- <p>author count {{ $author_count}} </p>
+    <p>author todat {{ $new_authors_today }}</p>
+    <p>consultation count {{ $consultation_count}}</p>
+    <p>approvals {{ $approvals }}</p>
+    <p>doctor {{ $doctors}} <p>
+    <p>users {{ $users}} </p> -->
+    
+     
     </div>
 
     <!-- Widgets -->
@@ -18,7 +58,7 @@
     </div>
     <!-- #END# Widgets -->
     <!-- Widgets -->
-    <div class="row clearfix">
+    <!-- <div class="row clearfix">
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3">
             <div class="info-box bg-purple hover-zoom-effect">
                 <div class="icon">
@@ -42,7 +82,7 @@
         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-9">
 
         </div>
-    </div>
+    </div> -->
     <!-- #END# Widgets -->
 
     <div class="row clearfix">
