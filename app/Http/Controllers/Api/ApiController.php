@@ -583,34 +583,29 @@ class ApiController extends Controller
     public function consultationDetail(Request $request, $id)
     {
         $token = $this::getCurrentToken($request);
-        $fetchConsultationList = Consultation::select([
-            'consultations.*',
-        ])
-            ->where('consultations.id', '=', $id)
-            ->get();
-        $consultationDetail = [];
-            foreach($fetchConsultationList as $consultation) {
-                $consultationDetail[] = [
-                    'id' => $consultation->id,
-                    'status' => $consultation->status,
-                    'consultation_date' => $consultation->created_at->format('Y-m-d h:i:s'),
-                    'patient' => $consultation->user->name,
-                    'doctor' => $consultation->userDoctorDetail->user->name,
-                    'phone' => $consultation->userDoctorDetail->user->phone,
-                    'address' => $consultation->userDoctorDetail->user->address,
-                    'image' => asset('uploads/profile/'.$consultation->userDoctorDetail->user->image),
-                    'vet_name' => $consultation->userDoctorDetail->vet_name,
-                    'price' => $consultation->userDoctorDetail->price,
-                    'discount' => $consultation->userDoctorDetail->discount ?? 0,
-                    'discounted_price' => ($consultation->userDoctorDetail->price - (($consultation->userDoctorDetail->price * $consultation->userDoctorDetail->discount)/100)),
-                    'description' => $consultation->userDoctorDetail->description,
-                    'max_payment_time' => Carbon::parse($consultation->created_at)->addHours(24)->format('Y-m-d h:i:s'),
-                    'pay_at' => Carbon::parse(Payment::where('consultation_id', '=', $consultation->id)->firstOrFail()->created_at)->format('Y-m-d h:i:s'),
-                    'approved_at' => Carbon::parse($consultation->approved_at)->format('Y-m-d h:i:s'),
-                    'rejected_at' => Carbon::parse($consultation->rejected_at)->format('Y-m-d h:i:s'),
-                ];
-            }
-
+        $consultation = Consultation::find($id);
+        $payment = Payment::where('id', $id)->first();
+        
+        $consultationDetail[] = [
+            'id' => $consultation->id,
+            'status' => $consultation->status,
+            'consultation_date' => $consultation->created_at->format('Y-m-d h:i:s'),
+            'patient' => $consultation->user->name,
+            'doctor' => $consultation->userDoctorDetail->user->name,
+            'phone' => $consultation->userDoctorDetail->user->phone,
+            'address' => $consultation->userDoctorDetail->user->address,
+            'image' => asset('uploads/profile/'.$consultation->userDoctorDetail->user->image),
+            'vet_name' => $consultation->userDoctorDetail->vet_name,
+            'price' => $consultation->userDoctorDetail->price,
+            'discount' => $consultation->userDoctorDetail->discount ?? 0,
+            'discounted_price' => ($consultation->userDoctorDetail->price - (($consultation->userDoctorDetail->price * $consultation->userDoctorDetail->discount)/100)),
+            'description' => $consultation->userDoctorDetail->description,
+            'max_payment_time' => Carbon::parse($consultation->created_at)->addHours(24)->format('Y-m-d h:i:s'),
+            'pay_at' => is_null($payment) ? "-" : $payment->created_at->format('Y-m-d h:i:s'),
+            'approved_at' => $consultation->approved_at ? Carbon::parse($consultation->approved_at)->addHours(24)->format('Y-m-d h:i:s') : "-",
+            'rejected_at' =>  $consultation->rejected_at ? Carbon::parse($consultation->rejected_at)->addHours(24)->format('Y-m-d h:i:s') : "-",
+        ];
+    
         return response()->json([
             'status' => 'OK',
             'results' => [
