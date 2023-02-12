@@ -537,7 +537,7 @@ class ApiController extends Controller
             }else{
                 $message = $request->message;
             }
-            $doctor = UserDoctorDetail::where('id', $request->user_doctor_detail_id)->first();
+            $doctor = UserDoctorDetail::where('id', $request->user_doctor_detail_id)->firstOrFail();
 
             $consultationId = Consultation::insertGetId([
                 'user_id' => $user->id,
