@@ -38,28 +38,42 @@ class PaymentController extends Controller
     }
 
     public function status($id){
-        $consultation_id = Payment::find($id)->first()->consultation_id;
-        $consultation = Consultation::find($consultation_id);
-        $consultation->status = "Sesi Konsultasi";
-        $consultation->approved_at =  Carbon::now()->format("Y-m-d H:i:s");
-        if($consultation->save()){
-            Toastr::success('Payment Approved!','Success',["positionClass"=>"toast-top-right"]);
-            return redirect()->back();
-        }else{
-            return redirect()->back()->with('successMsg','Gagal di konfirmasi');
+        DB::beginTransaction();
+        try{
+            $consultation_id = Payment::find($id)->first()->consultation_id;
+            $consultation = Consultation::find($consultation_id);
+            $consultation->status = "Sesi Konsultasi";
+            $consultation->approved_at =  Carbon::now()->format("Y-m-d H:i:s");
+            if($consultation->save()){
+                Toastr::success('Payment Approved!','Success',["positionClass"=>"toast-top-right"])
+                DB::commit();
+                return redirect()->back();
+            }else{
+                return redirect()->back()->with('successMsg','Gagal di konfirmasi');
+                DB::rollback();
+            }
+        } catch(Exception $e){
+            DB::rollback();
         }
     }
 
     public function statusDeny($id){
-        $consultation_id = Payment::find($id)->first()->consultation_id;
-        $consultation = Consultation::find($consultation_id);
-        $consultation->status = "Pembayaran Ditolak";
-        $consultation->rejected_at =  Carbon::now()->format("Y-m-d H:i:s");
-        if($consultation->save()){
-            Toastr::success('Payment Denied!','Success',["positionClass"=>"toast-top-right"]);
-            return redirect()->back();
-        }else{
-            return redirect()->back()->with('successMsg','Gagal di konfirmasi');
+        DB::beginTransaction();
+        try{
+            $consultation_id = Payment::find($id)->first()->consultation_id;
+            $consultation = Consultation::find($consultation_id);
+            $consultation->status = "Pembayaran Ditolak";
+            $consultation->rejected_at =  Carbon::now()->format("Y-m-d H:i:s");
+            if($consultation->save()){
+                Toastr::success('Payment Denied!','Success',["positionClass"=>"toast-top-right"]);
+                DB::commit();
+                return redirect()->back();
+            }else{
+                return redirect()->back()->with('successMsg','Gagal di konfirmasi');
+                DB::rollback();
+            }
+        } catch(Exception $e){
+            DB::rollback();
         }
     }
 }

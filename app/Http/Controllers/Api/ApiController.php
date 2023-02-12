@@ -852,6 +852,7 @@ class ApiController extends Controller
                 $reviewList[] = [
                     'id' => $rev->id,
                     'user_name'=> $rev->consultation->user->name,
+                    'doctor_image'=> asset('uploads/profile/'.$rev->consultation->userDoctorDetail->user->image),
                     'star'=> $rev->star,
                     'review' => $rev->review,
                     'created_at' => $rev->created_at->format('Y-m-d h:i:s'),
