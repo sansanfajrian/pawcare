@@ -14,8 +14,9 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
+        $consultation_count = Consultation::where('status', 'Selesai')->count();
       
-        return view('author.dashboard');
+        return view('author.dashboard', compact('consultation_count'));
     }
 
     public function showConsultation($id)
