@@ -8,7 +8,7 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="block-header">
+    <div class="block-header" style="height: 100vh;">
         <h2>DASHBOARD</h2>
     </div>
 
