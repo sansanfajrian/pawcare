@@ -16,7 +16,8 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $consultation_count = Consultation::where('status', 'Selesai')->count();
+        $doctor = UserDoctorDetail::where('user_id', '=', $user->id)->first();
+        $consultation_count = Consultation::where('status', 'Selesai')->orWhere('status', 'Selesai Mengulas')->where('user_doctor_detail_id', $doctor->id)->count();
         $review_count = Review::count();
       
         return view('author.dashboard', compact('consultation_count', 'review_count'));
