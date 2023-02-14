@@ -22,7 +22,7 @@ class DashboardController extends Controller
         $author_count = User::where('role_id', 2)->count();
         $new_authors_today = User::where('role_id', 2)
             ->whereDate('created_at', Carbon::today())->count();
-        $consultation_count = Consultation::where('status', 'Selesai')->count();
+        $consultation_count = Consultation::where('status', 'Selesai')->orWhere('status', 'Selesai Mengulas')->count();
         // $earning = Payment::select(['SUM(user_doctor_details.price)'])
         // ->join('consultations','consultations.id', 'consultations.user_doctor_detail_id')
         // ->join('user_doctor_details','consultations.user_doctor_detail_id','user_doctor_details.id')
