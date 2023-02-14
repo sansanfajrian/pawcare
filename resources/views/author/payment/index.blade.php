@@ -59,7 +59,7 @@
                                             @if($payment->consultation->status == "Pembayaran Ditolak" || $payment->consultation->status == "Menunggu Konfirmasi Pembayaran" )
                                                 <td>{{ $payment->consultation->status }}</td>
                                             @else
-                                                <td>-</td>
+                                                <td>Pembayaran diterima</td>
                                             @endif
                                             <td>{{ $payment->created_at }}</td>
                                             <td>{{ $payment->updated_at }}</td>

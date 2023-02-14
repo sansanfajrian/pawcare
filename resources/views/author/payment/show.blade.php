@@ -19,46 +19,40 @@
                     </div>
                     <div class="body">
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <div class="form-group label-floating">
                                         <label class="control-label">Doctor Name</label>
-                                        <input type="text" class="form-control" name="name" value="{{ $payment->consultation->userDoctorDetail->user->name }}"  disabled>
+                                        <input type="text" class="form-control  style-label-pawcare" name="name" value="{{ $payment->consultation->userDoctorDetail->user->name }}"  disabled>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-12">
+                     
+                                <div class="col-md-6">
                                     <div class="form-group label-floating">
                                         <label class="control-label">User Name</label>
-                                        <input type="text" class="form-control" name="name" value="{{ $payment->consultation->user->name }}"  disabled>
+                                        <input type="text" class="form-control  style-label-pawcare" name="name" value="{{ $payment->consultation->user->name }}"  disabled>
                                     </div>
                                 </div>
-                            </div>
+                        
 
-                            <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <div class="form-group label-floating">
                                         <label class="control-label">Consultation Date</label>
-                                        <input type="text" class="form-control" name="name" value="{{ $payment->consultation->created_at }}"  disabled>
+                                        <input type="text" class="form-control  style-label-pawcare" name="name" value="{{ $payment->consultation->created_at }}"  disabled>
                                     </div>
                                 </div>
-                            </div>
+                            
 
-                            <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <div class="form-group label-floating">
                                         <label class="control-label">Bank Name</label>
-                                        <input type="text" class="form-control" name="name" value="{{ $payment->bank_name }}"  disabled>
+                                        <input type="text" class="form-control  style-label-pawcare" name="name" value="{{ $payment->bank_name }}"  disabled>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-12">
+                          
+                                <div class="col-md-6">
                                     <div class="form-group label-floating">
                                         <label class="control-label">Sender Name</label>
-                                        <input type="text" class="form-control" name="name" value="{{ $payment->sender_name }}"  disabled>
+                                        <input type="text" class="form-control  style-label-pawcare" name="name" value="{{ $payment->sender_name }}"  disabled>
                                     </div>
                                 </div>
                             </div>
