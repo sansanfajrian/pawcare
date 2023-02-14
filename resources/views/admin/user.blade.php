@@ -49,7 +49,7 @@
                                         <td>{{$item['created_at']}}</td>
                                         <td class="text-center">
                                             <a href="{{ route('admin.dashboard-show-user',$item['id']) }}" class="btn btn-info waves-effect">
-                                                <i class="material-icons">details</i>
+                                                <i class="material-icons">launch</i>
                                             </a>
                                         </td>
                                     </tr>

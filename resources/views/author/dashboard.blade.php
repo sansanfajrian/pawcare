@@ -8,7 +8,7 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="block-header" style="height: 100vh;">
+    <div class="block-header" style="height: auto;">
     <div style="display: flex; margin-bottom: 1rem;">
     <div style=" 
     padding: 1rem;
@@ -17,8 +17,18 @@
     margin-top: 3rem;
     margin-right: 2rem;
     ">
-        <h2 style="color: #fb483a !important;">Jumalh Konsultasi : </h2> 
+        <h2 style="color: #fb483a !important;">Jumlah Konsultasi : </h2> 
         <h2 style="color: #000000 !important; font-weight: 900; margin-top: 1rem !important">{{ $consultation_count }} User </h2>
+    </div>
+    <div style=" 
+    padding: 1rem;
+    background-color: #ffffff;
+    border: solid #fb483a;
+    margin-top: 3rem;
+    margin-right: 2rem;
+    ">
+        <h2 style="color: #fb483a !important;">Jumlah Review : </h2> 
+        <h2 style="color: #000000 !important; font-weight: 900; margin-top: 1rem !important">{{ $review_count }} User </h2>
     </div>
     </div>
     </div>

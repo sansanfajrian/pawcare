@@ -54,7 +54,7 @@
                                 <label for="name" class="col-md-4 col-form-label text-md-right">{{ __('Phone') }}</label>
 
                                 <div class="col-md-6">
-                                    <input id="phone" type="text" class="form-control{{ $errors->has('phone') ? ' is-invalid' : '' }}" name="phone" value="0" required></input>
+                                    <input id="phone" type="text" class="form-control{{ $errors->has('phone') ? ' is-invalid' : '' }}" name="phone" placeholder="+62" required></input>
 
                                     @if ($errors->has('phone'))
                                         <span class="invalid-feedback">

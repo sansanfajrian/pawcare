@@ -10,12 +10,12 @@
                     <p class="copyright">{{ env('APP_NAME') }} @ {{ date('Y') }}. All rights reserved.</p>
                     <p class="copyright"><strong> Developed &amp; <i class="far fa-heart"></i> by </strong>
                         <a href="https://www.pawcare.website" target="_blank">PawCare</a></p>
-                    <ul class="icons">
+                    <!-- <ul class="icons">
                         <li><a target="_blank" href="https://www.facebook.com/pawcare"><i class="ion-social-facebook-outline"></i></a></li>
                         <li><a target="_blank" href="https://twitter.com/pawcare"><i class="ion-social-twitter-outline"></i></a></li>
                         <li><a target="_blank" href="https://www.instagram.com/pawcare/"><i class="ion-social-instagram-outline"></i></a></li>
                         <li><a target="_blank" href="https://www.youtube.com/pawcare"><i class="ion-social-youtube-outline"></i></a></li>
-                    </ul>
+                    </ul> -->
 
                 </div><!-- footer-section -->
             </div><!-- col-lg-4 col-md-6 -->

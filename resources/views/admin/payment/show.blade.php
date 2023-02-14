@@ -53,7 +53,8 @@
                                     <label class="control-label">Image</label>
                                 </div>
                                 <div class="col-md-6">
-                                    <img src="{{ asset('uploads/payments/'.$payment->image) }}" style="height: 200px; width: 200px;">
+                                    <img src="{{ url('uploads/payments/'.$payment->image) }}" style="height: 250px; width: 250px; object-fit: contain; background-color: #FFD1D1;">
+                                    
                                 </div>
                             </div>
 
