@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Review;
 use App\User;
+use App\UserDoctorDetail;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Query\Builder;
 
 class DashboardController extends Controller
 {

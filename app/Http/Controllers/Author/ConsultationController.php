@@ -21,7 +21,6 @@ class ConsultationController extends Controller
         #list of consultations
         $consultations = Consultation::with(['userDoctorDetail.user', 'user'])
             ->where('user_doctor_detail_id', $doctor->id)
-            ->where('status', '!=', "Done")
             ->get()
             ->map(function ($item) {
                 $item = $item->toArray();
