@@ -48,7 +48,7 @@
                                         <td>{{$item['phone']}}</td>
                                         <td>{{$item['created_at']}}</td>
                                         <td class="text-center">
-                                            <a href="{{ route('admin.dashboard-show-user',$item['id']) }}" class="btn btn-info waves-effect">
+                                            <a href="{{ route('admin.dashboard-show-user',$item['id']) }}" style="background-color: #FF9494 !important;" class="btn btn-info waves-effect">
                                                 <i class="material-icons">launch</i>
                                             </a>
                                         </td>

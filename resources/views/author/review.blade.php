@@ -45,7 +45,7 @@
                                         <td>{{$item->star}}</td>
                                         <td>{{$item->review}}</td>
                                         <td class="text-center">
-                                            <a href="{{ route('author.dashboard-show-review',$item['id']) }}" class="btn btn-info waves-effect">
+                                            <a href="{{ route('author.dashboard-show-review',$item['id']) }}" style="background-color: #FF9494 !important;" class="btn btn-info waves-effect">
                                                 <i class="material-icons">launch</i>
                                             </a>
                                         </td>

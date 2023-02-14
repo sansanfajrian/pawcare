@@ -64,7 +64,7 @@
                                             <td>{{ $payment->created_at }}</td>
                                             <td>{{ $payment->updated_at }}</td>
                                             <td class="text-center">
-                                                <a href="{{ route('author.payment.show',$payment->id) }}" class="btn btn-info waves-effect">
+                                                <a href="{{ route('author.payment.show',$payment->id) }}" style="background-color: #FF9494 !important;" class="btn btn-info waves-effect">
                                                     <i class="material-icons">launch</i>
                                                 </a>
                                             </td>

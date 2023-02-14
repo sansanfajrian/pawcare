@@ -52,7 +52,7 @@
                                             </span>
                                         </td>
                                         <td class="text-center">
-                                            <a href="{{ route('admin.dashboard-show-consultation',$item['id']) }}" class="btn btn-info waves-effect">
+                                            <a href="{{ route('admin.dashboard-show-consultation',$item['id']) }}" class="btn btn-info waves-effect" style="background-color: #FF9494 !important;">
                                                 <i class="material-icons">launch</i>
                                             </a>
                                         </td>
