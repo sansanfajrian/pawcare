@@ -601,7 +601,7 @@ class ApiController extends Controller
             'discounted_price' => ($consultation->userDoctorDetail->price - (($consultation->userDoctorDetail->price * $consultation->userDoctorDetail->discount)/100)),
             'description' => $consultation->userDoctorDetail->description,
             'max_payment_time' => Carbon::parse($consultation->created_at)->addHours(24)->format('Y-m-d h:i:s'),
-            'pay_at' => is_null($payment) ? "-" : $payment->created_at->format('Y-m-d h:i:s'),
+            'pay_at' => is_null($payment) ? null : $payment->created_at->format('Y-m-d h:i:s'),
             'approved_at' => $consultation->approved_at ? Carbon::parse($consultation->approved_at)->format('Y-m-d h:i:s') : null,
             'rejected_at' =>  $consultation->rejected_at ? Carbon::parse($consultation->rejected_at)->format('Y-m-d h:i:s') : null,
         ];
