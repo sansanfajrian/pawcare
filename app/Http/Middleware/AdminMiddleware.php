@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AdminMiddleware
 {
@@ -16,7 +17,10 @@ class AdminMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::check() && Auth::user()->role->id == 1)
+        $roles = DB::collection('roles')->get();
+        $firstRole = $roles->first();
+        $firstRoleId = $firstRole ? (string) $firstRole['_id'] : null;
+        if (Auth::check() && Auth::user()->role->id == $firstRoleId)
         {
             return $next($request);
         } else {
