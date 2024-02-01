@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AuthorMiddleware
 {
@@ -16,7 +17,10 @@ class AuthorMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::check() && Auth::user()->role->id == 2) 
+        $roles = DB::collection('roles')->get();
+        $secondRole = optional($roles->get(1));
+        $secondRoleId = $secondRole ? (string) $secondRole['_id'] : null;
+        if (Auth::check() && Auth::user()->role->id == $secondRoleId) 
         {
             $isApproved = Auth::user()->userDoctorDetails()->first()->is_approved ?? 0;
             if ($isApproved < 1) {

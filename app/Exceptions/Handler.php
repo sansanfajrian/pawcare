@@ -2,61 +2,39 @@
 
 namespace App\Exceptions;
 
-use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Throwable; // Make sure to import Throwable
 
 class Handler extends ExceptionHandler
 {
-    /**
-     * A list of the exception types that are not reported.
-     *
-     * @var array
-     */
-    protected $dontReport = [
-        //
-    ];
+    protected $dontReport = [];
 
-    /**
-     * A list of the inputs that are never flashed for validation exceptions.
-     *
-     * @var array
-     */
     protected $dontFlash = [
         'password',
         'password_confirmation',
     ];
 
-    /**
-     * Report or log an exception.
-     *
-     * @param  \Exception  $exception
-     * @return void
-     */
-    public function report(Exception $exception)
+    public function report(Throwable $e)
     {
-        parent::report($exception);
+        parent::report($e);
     }
 
-    /**
-     * Render an exception into an HTTP response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $exception
-     * @return \Illuminate\Http\Response
-     */
-    public function render($request, Exception $exception)
+    public function render($request, Throwable $e)
     {
-        if ($request->wantsJson()) {   //add Accept: application/json in request
-            return $this->handleApiException($request, $exception);
+        if ($request->wantsJson()) {
+            return $this->handleApiException($request, $e);
         }
-        return parent::render($request, $exception);
+
+        return parent::render($request, $e);
     }
 
-    private function handleApiException($request, Exception $exception)
+    private function handleApiException(Request $request, Throwable $e): Response
     {
-        $exception = $this->prepareException($exception);
+        $exception = $this->prepareException($e);
 
-        if ($exception instanceof \Illuminate\Http\Exception\HttpResponseException) {
+        if ($exception instanceof \Illuminate\Http\Exceptions\HttpResponseException) {
             $exception = $exception->getResponse();
         }
 
@@ -71,7 +49,7 @@ class Handler extends ExceptionHandler
         return $this->customApiResponse($exception);
     }
 
-    private function customApiResponse($exception)
+    private function customApiResponse($exception): Response
     {
         if (method_exists($exception, 'getStatusCode')) {
             $statusCode = $exception->getStatusCode();
@@ -79,7 +57,12 @@ class Handler extends ExceptionHandler
             $statusCode = 500;
         }
 
-        $response = [];
+        $response = [
+            'status' => $statusCode,
+            'error' => '',
+            'code' => 0,
+            'message' => '',
+        ];
 
         switch ($statusCode) {
             case 401:
@@ -95,8 +78,8 @@ class Handler extends ExceptionHandler
                 $response['message'] = 'Method Not Allowed';
                 break;
             case 422:
-                $response['message'] = $exception->original['message'];
-                $response['errors'] = $exception->original['errors'];
+                $response['message'] = $exception->original['message'] ?? 'Unprocessable Entity';
+                $response['errors'] = $exception->original['errors'] ?? [];
                 break;
             default:
                 $response['message'] = ($statusCode == 500) ? 'Whoops, looks like something went wrong' : $exception->getMessage();
@@ -104,12 +87,9 @@ class Handler extends ExceptionHandler
         }
 
         if (config('app.debug')) {
-            // $response['trace'] = $exception->getTrace();
             $response['errorMessage'] = $exception->getMessage();
             $response['code'] = $exception->getCode();
         }
-
-        $response['status'] = $statusCode;
 
         return response()->json([
             'status' => $response['status'],

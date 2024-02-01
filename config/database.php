@@ -18,7 +18,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'pgsql_heroku'),
+    'default' => env('DB_CONNECTION', 'mongodb'),
 
     /*
     |--------------------------------------------------------------------------
@@ -94,6 +94,11 @@ return [
             'prefix' => '',
         ],
 
+        'mongodb' => [
+            'driver'   => 'mongodb',
+            'dsn'      => env('DB_URI', 'mongodb+srv://user:user@cluster0.ihpnu0b.mongodb.net/'),
+            'database' => env('DB_DATABASE', 'pawcare'),
+        ],
     ],
 
     /*

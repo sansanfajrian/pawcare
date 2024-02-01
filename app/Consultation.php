@@ -2,10 +2,12 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
+
 
 class Consultation extends Model
 {
+
     public function user()
     {
         return $this->belongsTo('App\User', 'user_id');
