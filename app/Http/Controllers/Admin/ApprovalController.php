@@ -138,7 +138,6 @@ class ApprovalController extends Controller
             $doctor = UserDoctorDetail::find($request->doctor_id);
             $doctor->is_approved = 1;
             $doctor->save();
-
             $data = [
                 'name' => $doctor->user->name
             ];

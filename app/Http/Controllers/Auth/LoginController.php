@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class LoginController extends Controller
 {
@@ -35,10 +36,16 @@ class LoginController extends Controller
      */
     public function __construct()
     {
-        if (Auth::check() && Auth::user()->role->id == 1)
-        {
+        $roles = DB::collection('roles')->get();
+        
+        $firstRole = $roles->first();
+        $secondRole = optional($roles->get(1));
+
+        $firstRoleId = $firstRole ? (string) $firstRole['_id'] : null;
+        $secondRoleId = $secondRole ? (string) $secondRole['_id'] : null;
+        if (Auth::check() && Auth::user()->role->id == $firstRoleId){
             $this->redirectTo = route('admin.dashboard');
-        } else if(Auth::check() && Auth::user()->role->id == 2){
+        } else if(Auth::check() && Auth::user()->role->id == $secondRoleId){
             $this->redirectTo = route('author.dashboard');
         }
         $this->middleware('guest')->except('logout');

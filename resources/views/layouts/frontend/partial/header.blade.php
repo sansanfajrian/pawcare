@@ -7,14 +7,21 @@
                 <li><a href="{{ route('login') }}">Login</a></li>
                 <li><a href="{{ route('register') }}">Register Dokter</a></li>
             @else
-                @if(Auth::user()->role->id == 1)
+                @php
+                    $roles = \App\Role::all();
+                    $firstRole = $roles->first();
+                    $secondRole = optional($roles->get(1));
+                    $firstRoleId = $firstRole ? $firstRole->id : null;
+                    $secondRoleId = $secondRole ? $secondRole->id : null;
+                @endphp
+
+                @if(Auth::user()->role->id == $firstRoleId)
                     <li><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                 @endif
-                @if(Auth::user()->role->id == 2)
+                @if(Auth::user()->role->id == $secondRoleId)
                     <li><a href="{{ route('author.dashboard') }}">Dashboard</a></li>
                 @endif
             @endguest
         </ul><!-- main-menu -->
-
-    </div><!-- conatiner -->
+    </div><!-- container -->
 </header>

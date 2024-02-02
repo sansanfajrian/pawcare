@@ -14,6 +14,8 @@ use Illuminate\Foundation\Auth\RegistersUsers;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class RegisterController extends Controller
 {
@@ -78,7 +80,10 @@ class RegisterController extends Controller
         $user = new User();
         $image = $request->file('image');
         $imageName = "";
-        $slug = str_slug($data['name']);
+        $slug = Str::slug($data['name']);
+        $roles = DB::collection('roles')->get();
+        $secondRole = optional($roles->get(1));
+        $secondRoleId = $secondRole ? (string) $secondRole['_id'] : null;
         if (isset($image))
         {
             $currentDate = Carbon::now()->toDateString();
@@ -118,6 +123,7 @@ class RegisterController extends Controller
         }
 
         $user->name = $data['name'];
+        $user->role_id = $secondRoleId;
         $user->email = $data['email'];
         $user->password = Hash::make($data['password']);
         $user->address = $data['address'];
@@ -147,7 +153,7 @@ class RegisterController extends Controller
             $approval->status = 0;
             $approval->save();
             Toastr::success('Account succesfuly created, please wait until our admin approve your account', 'Success');
-            return view('auth.register');
+            return redirect($this->redirectPath());
         }
     }
 }

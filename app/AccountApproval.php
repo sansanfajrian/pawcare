@@ -10,7 +10,7 @@ class AccountApproval extends Model
 
     public function requester()
     {
-        return $this->belongsTo('App\User', 'requester_id', 'id');
+        return $this->belongsTo('App\User', 'requester_id', '_id');
     }
 
     public function approver()

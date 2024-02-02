@@ -35,7 +35,9 @@ class ResetPasswordController extends Controller
      */
     public function __construct()
     {
-        if (Auth::check() && Auth::user()->role->id == 1)
+        $firstRole = $roles->first();
+        $firstRoleId = $firstRole ? (string) $firstRole['_id'] : null;
+        if (Auth::check() && Auth::user()->role->id == $firstRoleId)
         {
             $this->redirectTo = route('admin.dashboard');
         } else {
