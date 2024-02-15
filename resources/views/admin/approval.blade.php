@@ -61,8 +61,8 @@
                                             <form action={{ route('admin.approvals.approve') }} method="POST">
                                                 @csrf
                                                 @method('PUT')
-                                                <input type="hidden" name="doctor_id" value={{ $item['_id'] }}>
-                                                <input type="hidden" name="approval_id" value={{ $item['requester']['user_doctor_details']['_id'] }}>
+                                                <input type="hidden" name="doctor_id" value={{ $item['requester']['user_doctor_details']['_id'] }}>
+                                                <input type="hidden" name="approval_id" value={{ $item['requester']['_id'] }}>
                                                 <button type="submit" class="btn btn-primary btn-sm">Approve</button>
                                             </form>
                                         </td>

@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class ApiController extends Controller
 {
@@ -79,6 +80,9 @@ class ApiController extends Controller
     public function registerUser(Request $request)
     {
         DB::beginTransaction();
+        $roles = DB::collection('roles')->get();
+        $thirdRole = optional($roles->get(2));
+        $thirdRoleId = $thirdRole ? (string) $thirdRole['_id'] : null;
         try {
             $message = "";
             if(!$request->message){
@@ -89,7 +93,7 @@ class ApiController extends Controller
 
             $userId = User::insertGetId([
                 'name' => $request->name,
-                'role_id' => 3,
+                'role_id' => $thirdRoleId,
                 'email' => $request->email,
                 'gender' => $request->gender,
                 'address' => $request->address,
@@ -115,8 +119,8 @@ class ApiController extends Controller
 
     public function editUser(Request $request)
     {
-        $token = $this::getCurrentToken($request);
-        $user = User::where('id', $token->user_id)->first();
+        $token = $this->getCurrentToken($request);
+        $user = User::where('_id', $this->getCurrentUserId($request))->first();
         if(empty($user)) {
             return response()->json([
                 'status' => 'FAIL',
@@ -128,7 +132,7 @@ class ApiController extends Controller
 
         DB::beginTransaction();
         try{
-            $user = User::find($token->user_id);
+            $user = User::find($this->getCurrentUserId($request));
             $user->name =  $request->name;
             $user->email = $request->email;
             $user->address = $request->address;
@@ -137,11 +141,11 @@ class ApiController extends Controller
                 $isSuccess = true;
                 DB::commit();
             }
-            $fetchUserDetail = User::where('id','=',$user->id)->get();
+            $fetchUserDetail = User::where('_id',$user->_id)->get();
             $userDetail = [];
             foreach($fetchUserDetail as $users) {
                 $userDetail[] = [
-                    'id' => $users->id,
+                    'id' => $users->_id,
                     'name' => $users->name,
                     'gender' => $users->gender,
                     'email' => $users->email,
@@ -168,8 +172,8 @@ class ApiController extends Controller
 
     public function editBannerImage(Request $request)
     {
-        $token = $this::getCurrentToken($request);
-        $user = User::where('id', $token->user_id)->first();
+        $token = $this->getCurrentToken($request);
+        $user = User::where('_id', $this->getCurrentUserId($request))->first();
         if(empty($user)) {
             return response()->json([
                 'status' => 'FAIL',
@@ -186,9 +190,9 @@ class ApiController extends Controller
 
         DB::beginTransaction();
         try{
-            $slug = str_slug($request->name);
+            $slug = Str::slug($request->name);
             $image = $request->file('banner');
-            $user = User::find($token->user_id);
+            $user = User::find($this->getCurrentUserId($request));
             if (isset($image))
             {
                 $currentDate = Carbon::now()->toDateString();
@@ -209,7 +213,7 @@ class ApiController extends Controller
                 $isSuccess = true;
                 DB::commit();
             }
-            $fetchUserDetail = User::where('id','=',$user->id)->get();
+            $fetchUserDetail = User::where('_id',$user->_id)->get();
             $userDetail = [];
             foreach($fetchUserDetail as $users) {
                 $userDetail[] = [
@@ -233,8 +237,8 @@ class ApiController extends Controller
 
     public function editProfileImage(Request $request)
     {
-        $token = $this::getCurrentToken($request);
-        $user = User::where('id', $token->user_id)->first();
+        $token = $this->getCurrentToken($request);
+        $user = User::where('_id', $this->getCurrentUserId($request))->first();
         if(empty($user)) {
             return response()->json([
                 'status' => 'FAIL',
@@ -251,9 +255,9 @@ class ApiController extends Controller
 
         DB::beginTransaction();
         try{
-            $slug = str_slug($request->name);
+            $slug = Str::slug($request->name);
             $image = $request->file('image');
-            $user = User::find($token->user_id);
+            $user = User::find($this->getCurrentUserId($request));
             if (isset($image))
             {
                 $currentDate = Carbon::now()->toDateString();
@@ -274,7 +278,7 @@ class ApiController extends Controller
                 $isSuccess = true;
                 DB::commit();
             }
-            $fetchUserDetail = User::where('id','=',$user->id)->get();
+            $fetchUserDetail = User::where('_id',$user->_id)->get();
             $userDetail = [];
             foreach($fetchUserDetail as $users) {
                 $userDetail[] = [
@@ -298,8 +302,8 @@ class ApiController extends Controller
 
     public function changePassword(Request $request)
     {
-        $token = $this::getCurrentToken($request);
-        $user = User::where('id', $token->user_id)->first();
+        $token = $this->getCurrentToken($request);
+        $user = User::where('_id', $this->getCurrentUserId($request))->first();
         if(empty($user)) {
             return response()->json([
                 'status' => 'FAIL',
@@ -337,12 +341,12 @@ class ApiController extends Controller
 
     public function userDetail(Request $request)
     {
-        $token = $this::getCurrentToken($request);
-        $fetchUserList = User::where('id', '=', $token->user_id)->get();
+        $token = $this->getCurrentToken($request);
+        $fetchUserList = User::where('_id', $this->getCurrentUserId($request))->get();
         $userList = [];
         foreach($fetchUserList as $user) {
             $userList[] = [
-                'id' => $user->id,
+                'id' => $user->_id,
                 'name' => $user->name,
                 'gender' => $user->gender,
                 'email' => $user->email,
@@ -360,46 +364,43 @@ class ApiController extends Controller
             ]
         ]);
     }   
+
     public function doctorList(Request $request)
     {
         $request->validate([
             'search' => 'nullable'
         ]);
 
-        $token = $this::getCurrentToken($request);
-        $fetchDoctorList = UserDoctorDetail::select([
-            'user_doctor_details.*',
-            'users.name AS name'
-        ])
-            ->leftJoin('users', 'users.id', 'user_doctor_details.user_id')
-            ->where('user_doctor_details.is_approved', '=', 1);
+        $token = $this->getCurrentToken($request);
+        $fetchDoctorList = UserDoctorDetail::query()
+        ->leftJoin('users', 'users._id', '=', 'user_doctor_details.user_id')
+        ->orderBy('users.name', 'ASC')
+        ->where('is_approved',true);
         # order by average review ratings
-        $reviewsWithConsultation = DB::table('consultations as c')
-        ->select(
-            DB::raw('AVG(r.star) as avg_star'), 
-            DB::raw('COUNT(r.id) AS consultation_count'),
-            'c.user_doctor_detail_id as doctor_id')
-        ->groupBy('c.user_doctor_detail_id')
-        ->join('reviews as r', 'r.consultation_id', 'c.id');
-        $fetchDoctorList->leftJoinSub($reviewsWithConsultation, 'rev_sub', 'rev_sub.doctor_id', 'user_doctor_details.id')
-        ->addSelect(
-            DB::raw(
-                "CASE WHEN rev_sub.avg_star is null THEN '-' ".
-                "ELSE rev_sub.avg_star ".
-                "END as ratings"
-            ),
-            'consultation_count'
+        $reviewsWithConsultation = Consultation::select(
+            'user_doctor_detail_id',
+            DB::raw('AVG(star) as avg_star'), 
+            DB::raw('COUNT(_id) AS consultation_count')
         )
-        ->orderBy('ratings', 'desc')
-        ->orderBy('user_doctor_details.created_at', 'asc');
+        ->groupBy('user_doctor_detail_id');
+        // $fetchDoctorList->leftJoinSub($reviewsWithConsultation, 'rev_sub', 'rev_sub.doctor_id', 'user_doctor_details._id')
+        // ->addSelect(
+        //     DB::raw(
+        //         "CASE WHEN rev_sub.avg_star is null THEN '-' ".
+        //         "ELSE rev_sub.avg_star ".
+        //         "END as ratings"
+        //     ),
+        //     'consultation_count'
+        // )
+        // ->orderBy('ratings', 'desc')
+        // ->orderBy('user_doctor_details.created_at', 'asc');
         # handling search parameter
         if ($request->has('search')) {
             $search = $request->search;
             # searchable attributes (name, address, price, description)
-            $fetchDoctorList->orWhere('name', 'like', "%$search%")
-                ->orWhere('users.name', 'like', "%$search%")
-                ->orWhere('users.address', 'like', "%$search%")
-                ->orWhere('user_doctor_details.description', 'like', "%$search%");
+            $fetchDoctorList->orWhere('users.name', 'like', "$search")
+                ->orWhere('users.address', 'like', "$search")
+                ->orWhere('user_doctor_details.description', 'like', "$search");
         }
 
         if ($request->has('items')) {
@@ -411,17 +412,35 @@ class ApiController extends Controller
         
         $doctorList = [];
         foreach($fetchDoctorList as $doctor) {
+
+            // Find matching aggregated data for the current user doctor detail
+            $aggregated = Consultation::raw(function($collection) use ($doctor) {
+                return $collection->aggregate([
+                    ['$match' => ['user_doctor_detail_id' => (string) $doctor->_id]],
+                    ['$group' => [
+                        '_id' => '$user_doctor_detail_id',
+                        'avg_star' => ['$avg' => '$star'],
+                        'consultation_count' => ['$sum' => 1]
+                    ]]
+                ]);
+            })->first();
+
+            // If aggregated data exists, set ratings and consultation count
+            if ($aggregated) {
+                $ratings = $aggregated->avg_star;
+                $consultationCount = $aggregated->consultation_count;
+            }
             $doctorList[] = [
-                'id' => $doctor->user->id,
-                'user_doctor_detail_id' => $doctor->id,
+                'id' => $doctor->user->_id,
+                'user_doctor_detail_id' => $doctor->_id,
                 'name' => $doctor->user->name,
                 'vet_name' => $doctor->vet_name,
                 'image' => asset('uploads/profile/'.$doctor->user->image),
                 'price' => $doctor->price,
                 'discount' => $doctor->discount ?? 0,
                 'discounted_price' => ($doctor->price - (($doctor->price * $doctor->discount)/100)),
-                'avg_ratings' => number_format((float)($doctor->ratings), 1),
-                'consultation_count' => $doctor->consultation_count ?? 0
+                'avg_ratings' => number_format((float)($ratings), 1),
+                'consultation_count' => $consultationCount ?? 0
             ];
         }
 
@@ -435,39 +454,55 @@ class ApiController extends Controller
 
     public function doctorDetail(Request $request, $id)
     {
-        $token = $this::getCurrentToken($request);
-        $fetchDoctorList = UserDoctorDetail::select([
-            'user_doctor_details.*',
-            'users.name AS name',
-            'users.address AS address'
-        ])
-            ->leftJoin('users', 'users.id', 'user_doctor_details.user_id')
-            ->orderBy('users.name', 'ASC')
-            ->where('user_doctor_details.user_id', '=', $id);
-        
-        $reviewsWithConsultation = DB::table('consultations as c')
-        ->select(
-            DB::raw('AVG(r.star) as avg_star'), 
-            DB::raw('COUNT(r.id) AS consultation_count'),
-            'c.user_doctor_detail_id as doctor_id')
-        ->groupBy('c.user_doctor_detail_id')
-        ->join('reviews as r', 'r.consultation_id', 'c.id');
-        $fetchDoctorList->leftJoinSub($reviewsWithConsultation, 'rev_sub', 'rev_sub.doctor_id', 'user_doctor_details.id')
-        ->addSelect(
-            DB::raw(
-                "CASE WHEN rev_sub.avg_star is null THEN '-' ".
-                "ELSE rev_sub.avg_star ".
-                "END as ratings"
-            ),
-            'consultation_count'
-        );
+        $token = $this->getCurrentToken($request);
+        $fetchDoctorList = UserDoctorDetail::where('user_id', $id)->get();
 
-        $fetchDoctorList = $fetchDoctorList->get();
+        $reviewsWithConsultation = Consultation::select(
+            'user_doctor_detail_id',
+            DB::raw('AVG(star) as avg_star'), 
+            DB::raw('COUNT(_id) AS consultation_count')
+        )
+        ->groupBy('user_doctor_detail_id');
+        // $reviewsWithConsultation = DB::table('consultations as c')
+        // ->select(
+        //     DB::raw('AVG(r.star) as avg_star'), 
+        //     DB::raw('COUNT(r.id) AS consultation_count'),
+        //     'c.user_doctor_detail_id as doctor_id')
+        // ->groupBy('c.user_doctor_detail_id')
+        // ->join('reviews as r', 'r.consultation_id', 'c.id');
+        // $fetchDoctorList->leftJoinSub($reviewsWithConsultation, 'rev_sub', 'rev_sub.doctor_id', 'user_doctor_details.id')
+        // ->addSelect(
+        //     DB::raw(
+        //         "CASE WHEN rev_sub.avg_star is null THEN '-' ".
+        //         "ELSE rev_sub.avg_star ".
+        //         "END as ratings"
+        //     ),
+        //     'consultation_count'
+        // );
+
         $doctorList = [];
         foreach($fetchDoctorList as $doctor) {
+            // Find matching aggregated data for the current user doctor detail
+            $aggregated = Consultation::raw(function($collection) use ($doctor) {
+                return $collection->aggregate([
+                    ['$match' => ['user_doctor_detail_id' => (string) $doctor->_id]],
+                    ['$group' => [
+                        '_id' => '$user_doctor_detail_id',
+                        'avg_star' => ['$avg' => '$star'],
+                        'consultation_count' => ['$sum' => 1]
+                    ]]
+                ]);
+            })->first();
+
+            // If aggregated data exists, set ratings and consultation count
+            if ($aggregated) {
+                $ratings = $aggregated->avg_star;
+                $consultationCount = $aggregated->consultation_count;
+            }
+
             $doctorList[] = [
-                'id' => $doctor->user->id,
-                'user_doctor_detail_id' => $doctor->id,
+                'id' => $doctor->user->_id,
+                'user_doctor_detail_id' => $doctor->_id,
                 'name' => $doctor->user->name,
                 'phone' => $doctor->user->phone,
                 'address' => $doctor->user->address,
@@ -478,8 +513,8 @@ class ApiController extends Controller
                 'discount' => $doctor->discount ?? 0,
                 'discounted_price' => ($doctor->price - (($doctor->price * $doctor->discount)/100)),
                 'description' => $doctor->description,
-                'avg_ratings' => number_format((float)($doctor->ratings), 1),
-                'consultation_count' => $doctor->consultation_count ?? 0
+                'avg_ratings' => number_format((float)($ratings), 1),
+                'consultation_count' => $consultationCount ?? 0
             ];
         }
 
@@ -493,12 +528,8 @@ class ApiController extends Controller
 
     public function bannerList(Request $request)
     {
-        $token = $this::getCurrentToken($request);
-        $fetchBannerList = Banner::select([
-            'banners.*'
-        ])
-            ->orderBy('banners.sequence', 'ASC')
-            ->get();
+        $token = $this->getCurrentToken($request);
+        $fetchBannerList = Banner::orderBy('sequence', 'ASC')->get();
 
         $bannerList = [];
         foreach($fetchBannerList as $banner) {
@@ -518,8 +549,8 @@ class ApiController extends Controller
 
     public function consultation(Request $request)
     {
-        $token = $this::getCurrentToken($request);
-        $user = User::where('id', $token->user_id)->first();
+        $token = $this->getCurrentToken($request);
+        $user = User::where('_id', $this->getCurrentUserId($request))->first();
         if(empty($user)) {
             return response()->json([
                 'status' => 'FAIL',
@@ -537,16 +568,16 @@ class ApiController extends Controller
             }else{
                 $message = $request->message;
             }
-            $doctor = UserDoctorDetail::where('id', $request->user_doctor_detail_id)->firstOrFail();
+            $doctor = UserDoctorDetail::where('_id', $request->user_doctor_detail_id)->firstOrFail();
 
             $consultationId = Consultation::insertGetId([
-                'user_id' => $user->id,
-                'user_doctor_detail_id' => $doctor->id,
+                'user_id' => $user->_id,
+                'user_doctor_detail_id' => $doctor->_id,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
 
-            $fetchConsultationDetail = Consultation::where('id','=',$consultationId)->get();
+            $fetchConsultationDetail = Consultation::where('_id',$consultationId)->get();
             $consultationDetail = [];
             foreach($fetchConsultationDetail as $consultation) {
                 $consultationDetail[] = [
@@ -570,7 +601,8 @@ class ApiController extends Controller
             DB::rollback();
             $isSuccess = false;
         }
-        ConsultationCancelPayment::dispatch($consultationId)->delay(Carbon::parse($consultation->created_at)->addHours(24)); 
+        $consultationDate = Consultation::find($consultationId);
+        ConsultationCancelPayment::dispatch($consultationId)->delay(Carbon::parse($consultationDate->created_at)->addHours(24)); 
         return response()->json([
             'status' => $isSuccess ? 'OK' : 'FAIL',
             'message' => $isSuccess ? 'Berhasil konsultasi dengan dokter!' : 'Gagal untuk konsultasi dengan dokter!',
@@ -582,12 +614,12 @@ class ApiController extends Controller
 
     public function consultationDetail(Request $request, $id)
     {
-        $token = $this::getCurrentToken($request);
+        $token = $this->getCurrentToken($request);
         $consultation = Consultation::find($id);
-        $payment = Payment::where('id', $id)->first();
+        $payment = Payment::where('_id', $id)->first();
         
         $consultationDetail[] = [
-            'id' => $consultation->id,
+            'id' => $consultation->_id,
             'status' => $consultation->status,
             'consultation_date' => $consultation->created_at->format('Y-m-d h:i:s'),
             'patient' => $consultation->user->name,
@@ -619,8 +651,8 @@ class ApiController extends Controller
         $request->validate([
             'search' => 'nullable'
         ]);
-        $token = $this::getCurrentToken($request);
-        $user = User::where('id', $token->user_id)->first();
+        $token = $this->getCurrentToken($request);
+        $user = User::where('_id', $this->getCurrentUserId($request))->first();
         if(empty($user)) {
             return response()->json([
                 'status' => 'FAIL',
@@ -628,11 +660,7 @@ class ApiController extends Controller
             ]);
         }
 
-        $fetchConsultationList = Consultation::select([
-            'consultations.*'
-        ])
-            ->orderBy('consultations.created_at', 'DESC')
-            ->where('consultations.user_id', '=', $user->id);
+        $fetchConsultationList = Consultation::orderBy('consultations.created_at', 'DESC')->where('consultations.user_id', $user->_id).get();
         # handling search parameters
         if ($request->has('search')) {
             # search variable assignment
@@ -658,7 +686,7 @@ class ApiController extends Controller
         $consultationList = [];
         foreach($fetchConsultationList as $consultation) {
             $consultationList[] = [
-                'id' => $consultation->id,
+                'id' => $consultation->_id,
                 'doctor' => $consultation->userDoctorDetail->user->name,
                 'vet_name' => $consultation->userDoctorDetail->vet_name,
                 'price' => $consultation->userDoctorDetail->price,
@@ -680,8 +708,8 @@ class ApiController extends Controller
 
     public function payment(Request $request)
     {
-        $token = $this::getCurrentToken($request);
-        $user = User::where('id', $token->user_id)->first();
+        $token = $this->getCurrentToken($request);
+        $user = User::where('_id', $this->getCurrentUserId($request))->first();
         if(empty($user)) {
             return response()->json([
                 'status' => 'FAIL',
@@ -714,7 +742,7 @@ class ApiController extends Controller
                 ]);
                 // get form image
                 $image = $request->file('image');
-                $slug = str_slug($request->sender_name);
+                $slug = Str::slug($request->sender_name);
                 if (isset($image)) 
                 {
                     //            make unique name for image
@@ -759,8 +787,8 @@ class ApiController extends Controller
 
     public function review(Request $request)
     {
-        $token = $this::getCurrentToken($request);
-        $user = User::where('id', $token->user_id)->first();
+        $token = $this->getCurrentToken($request);
+        $user = User::where('_id', $this->getCurrentUserId($request))->first();
         if(empty($user)) {
             return response()->json([
                 'status' => 'FAIL',
@@ -793,12 +821,12 @@ class ApiController extends Controller
             $consultation = Consultation::find($request->consultation_id);
             $consultation->status = "Selesai Mengulas";
             $consultation->save();
-            $fetchReviewList = Review::where('id', $reviewId)->get();
+            $fetchReviewList = Review::where('_id', $reviewId)->get();
 
             $reviewList = [];
             foreach($fetchReviewList as $rev) {
                 $reviewList[] = [
-                    'id' => $rev->id,
+                    'id' => $rev->_id,
                     'consultation_id'=> $rev->consultation_id,
                     'star'=> $rev->star,
                     'review' => $rev->review
@@ -820,7 +848,7 @@ class ApiController extends Controller
 
     public function reviewList(Request $request, $id)
     {
-        $token = $this::getCurrentToken($request);
+        $token = $this->getCurrentToken($request);
 
         $isSuccess = false;
 
@@ -838,14 +866,14 @@ class ApiController extends Controller
             ])
                 ->orderBy('reviews.created_at', 'DESC')
                 ->join('consultations', 'consultations.id', 'reviews.consultation_id')
-                ->where('consultations.user_doctor_detail_id', '=', $id)
+                ->where('consultations.user_doctor_detail_id', $id)
                 ->get();
             $isSuccess = true;
 
             $reviewList = [];
             foreach($fetchReviewList as $rev) {
                 $reviewList[] = [
-                    'id' => $rev->id,
+                    'id' => $rev->_id,
                     'user_name'=> $rev->consultation->user->name,
                     'user_image'=> asset('uploads/profile/'.$rev->consultation->user->image),
                     'star'=> $rev->star,
@@ -866,5 +894,16 @@ class ApiController extends Controller
         ]);
     }
 
-    
+    private function getCurrentUserId(Request $request)
+    {
+        $token = $this->getCurrentToken($request);
+        if (!$token) {
+            return null; // Or handle the case when no token is provided
+        }
+
+        $accessToken = DB::table('oauth_access_tokens')
+            ->where('id', $token)
+            ->first();
+        return $accessToken ? $accessToken['user_id'] : null;
+    }
 }

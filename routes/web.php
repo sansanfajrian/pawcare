@@ -15,6 +15,10 @@ Route::get('/', function () {
     return Redirect::to('login');
 });
 
+Route::get('/home', function () {
+    return Redirect::to('login');
+});
+
 Route::get('profile/{username}', 'AuthorController@profile')->name('author.profile');
 
 Auth::routes();

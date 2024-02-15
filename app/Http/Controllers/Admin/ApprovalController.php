@@ -134,24 +134,19 @@ class ApprovalController extends Controller
         # to avoid unwanted errors
 
         # handling approval on user_doctor_details
-        if ($request->has('doctor_id')) {
+        if ($request->has('doctor_id') && $request->has('approval_id')) {
             $doctor = UserDoctorDetail::find($request->doctor_id);
-            $doctor->is_approved = 1;
-            $doctor->save();
-            $data = [
-                'name' => $doctor->user->name
-            ];
-
-            Mail::to($doctor->user->email)->send(new SendEmail($data));
+            $doctor->is_approved = true;
+            $approval = AccountApproval::where('requester_id', $request->approval_id)->first();
+            if($doctor->save() && $approval->delete()){
+                $data = [
+                    'name' => $doctor->user->name
+                ];
+                Toastr::success('account has been successfully approved.', 'Success');
+                Mail::to($doctor->user->email)->send(new SendEmail($data));
+            }
         }
 
-        # delete record on account_approvals
-        if ($request->has('approval_id')) {
-            $approval = AccountApproval::find($request->approval_id)->delete();
-        }
-
-
-        Toastr::success('account has been successfully approved.', 'Success');
         return redirect()->back();
     }
 }

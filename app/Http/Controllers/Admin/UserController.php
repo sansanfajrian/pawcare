@@ -5,13 +5,17 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\User;
+use DB;
 
 class UserController extends Controller
 {
     public function index()
     {
         #list of users
-        $users = User::where('role_id', 3)->get()
+        $roles = DB::collection('roles')->get();
+        $thirdRole = optional($roles->get(2));
+        $thirdRoleId = $thirdRole ? (string) $thirdRole['_id'] : null;
+        $users = User::where('role_id', $thirdRoleId)->get()
             ->map(function ($item) {
                 return [
                     'id' => $item->id,

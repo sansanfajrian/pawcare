@@ -153,7 +153,7 @@ class RegisterController extends Controller
             $approval->status = 0;
             $approval->save();
             Toastr::success('Account succesfuly created, please wait until our admin approve your account', 'Success');
-            return redirect($this->redirectPath());
+            return $user;
         }
     }
 }

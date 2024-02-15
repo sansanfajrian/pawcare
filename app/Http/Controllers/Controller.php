@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Laravel\Passport\TokenRepository;
 use Laravel\Passport\ClientRepository;
 use Lcobucci\JWT\Parser;
+use Lcobucci\JWT\Token\Builder;
 
 
 class Controller extends BaseController
@@ -18,8 +19,7 @@ class Controller extends BaseController
     protected static function getCurrentToken($request)
 	{
 	    $tokenRepository = new TokenRepository();
-	    $jwt = (new Parser())->parse($request->bearerToken());
-	    $token = $tokenRepository->find($jwt->getClaim('jti'));
+	    $token = app(Parser::class)->parse($request->bearerToken())->claims()->get('jti');
 
 	    return $token;
 	}

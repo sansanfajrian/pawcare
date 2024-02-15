@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Str;
 
 class SettingsController extends Controller
 {
@@ -31,7 +32,7 @@ class SettingsController extends Controller
         
         $user = User::findOrFail(Auth::id());
         $image = $request->file('image');
-        $slug = str_slug($request->name);
+        $slug = Str::slug($request->name);
         if (isset($image))
         {
             $currentDate = Carbon::now()->toDateString();
@@ -51,7 +52,7 @@ class SettingsController extends Controller
         }
 
         $banner = $request->file('banner');
-        $slug = str_slug($request->name);
+        $slug = Str::slug($request->name);
         if (isset($banner))
         {
             $currentDate = Carbon::now()->toDateString();

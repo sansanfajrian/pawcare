@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Str;
 
 class BannerController extends Controller
 {
@@ -47,7 +48,7 @@ class BannerController extends Controller
         ]);
         // get form image
         $image = $request->file('image');
-        $slug = str_slug($request->sequence);
+        $slug = Str::slug($request->sequence);
         if (isset($image))
         {
 //            make unique name for image
@@ -119,7 +120,7 @@ class BannerController extends Controller
         ]);
         // get form image
         $image = $request->file('image');
-        $slug = str_slug($request->sequence);
+        $slug = Str::slug($request->sequence);
         $banner = Banner::find($id);
         if (isset($image))
         {

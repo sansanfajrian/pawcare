@@ -4,7 +4,6 @@ namespace App;
 
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
-use MongoDB\Laravel\Eloquent\Model as Eloquent;
 use MongoDB\Laravel\Auth\User as Authenticatable;
 
 class User extends Authenticatable
