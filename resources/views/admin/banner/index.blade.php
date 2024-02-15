@@ -61,7 +61,7 @@
                                                 <a href="{{ route('admin.banner.edit',$banner->id) }}" class="btn btn-info waves-effect">
                                                     <i class="material-icons">edit</i>
                                                 </a>
-                                                <button class="btn btn-danger waves-effect" type="button" onclick="deleteBanner({{ $banner->id }})">
+                                                <button class="btn btn-danger waves-effect" type="button" onclick="deleteBanner('{{ $banner->id }}')">
                                                     <i class="material-icons">delete</i>
                                                 </button>
                                                 <form id="delete-form-{{ $banner->id }}" action="{{ route('admin.banner.destroy',$banner->id) }}" method="POST" style="display: none;">
@@ -97,7 +97,7 @@
     <script src="{{ asset('assets/backend/js/pages/tables/jquery-datatable.js') }}"></script>
     <script src="https://unpkg.com/sweetalert2@7.19.1/dist/sweetalert2.all.js"></script>
     <script type="text/javascript">
-        function deleteBanner(id) {
+        function deleteBanner(_id) {
             swal({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -114,7 +114,7 @@
             }).then((result) => {
                 if (result.value) {
                     event.preventDefault();
-                    document.getElementById('delete-form-'+id).submit();
+                    document.getElementById('delete-form-'+_id).submit();
                 } else if (
                     // Read more about handling dismissals
                     result.dismiss === swal.DismissReason.cancel

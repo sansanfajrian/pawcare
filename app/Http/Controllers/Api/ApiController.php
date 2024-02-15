@@ -616,7 +616,7 @@ class ApiController extends Controller
     {
         $token = $this->getCurrentToken($request);
         $consultation = Consultation::find($id);
-        $payment = Payment::where('_id', $id)->first();
+        $payment = Payment::where('consultation_id', $consultation->_id)->first();
         
         $consultationDetail[] = [
             'id' => $consultation->_id,
@@ -660,7 +660,7 @@ class ApiController extends Controller
             ]);
         }
 
-        $fetchConsultationList = Consultation::orderBy('consultations.created_at', 'DESC')->where('consultations.user_id', $user->_id).get();
+        $fetchConsultationList = Consultation::orderBy('created_at', 'DESC')->where('user_id', $user->_id);
         # handling search parameters
         if ($request->has('search')) {
             # search variable assignment
@@ -692,7 +692,6 @@ class ApiController extends Controller
                 'price' => $consultation->userDoctorDetail->price,
                 'discount' => $consultation->userDoctorDetail->discount ?? 0,
                 'discounted_price' => ($consultation->userDoctorDetail->price - (($consultation->userDoctorDetail->price * $consultation->userDoctorDetail->discount)/100)),
-                'status'=> $consultation->status,
                 'created_at'=> $consultation->created_at->format('d-m-Y'),
                 'updated_at'=> $consultation->updated_at->format('d-m-Y')
             ];
